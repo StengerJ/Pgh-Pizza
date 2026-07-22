@@ -13,35 +13,12 @@
 }
 
 .navbar-brand {
-  align-items: center;
   color: var(--accent-red);
-  display: inline-flex;
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 700;
-  gap: 8px;
   text-decoration: none;
   white-space: nowrap;
-}
-
-.brand-mark {
-  height: 26px;
-  width: 26px;
-}
-
-.brand-mark-slice {
-  fill: var(--accent-red);
-}
-
-.brand-mark-crust {
-  fill: none;
-  stroke: var(--palette-gold);
-  stroke-linecap: round;
-  stroke-width: 1.6;
-}
-
-.brand-mark-topping {
-  fill: var(--on-accent);
 }
 
 .navbar-links,

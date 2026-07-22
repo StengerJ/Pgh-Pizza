@@ -24,7 +24,7 @@ export class ClientLoggerService {
   logError(error: unknown, context: Record<string, unknown> = {}): void {
     const payload = this.createPayload(error, context);
 
-    console.error('[PGH-Pizza]', payload.message, {
+    console.error('[PGH Pizza]', payload.message, {
       error,
       context
     });

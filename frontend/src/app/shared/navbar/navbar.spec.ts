@@ -34,7 +34,7 @@ describe('Navbar', () => {
     );
 
     expect(linkText).toContain('Home');
-    expect(linkText).toContain('PGH-Pizza');
+    expect(linkText).toContain('PGH Pizza');
     expect(linkText).toContain('Ratings');
     expect(linkText).toContain('Blog');
     expect(linkText).toContain('Contributors');

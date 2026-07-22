@@ -10,5 +10,5 @@ import { Navbar } from './shared/navbar/navbar';
   styleUrls: ['./app.css']
 })
 export class App {
-  protected readonly title = signal('PGH-Pizza');
+  protected readonly title = signal('PGH Pizza');
 }
