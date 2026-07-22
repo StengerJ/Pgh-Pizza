@@ -67,7 +67,22 @@ The default local admin is `admin@pgh-pizza.local` / `ChangeMe123!`. Override it
 
 ## Linux Docker Compose Server
 
-From the repo root on a Linux server, run:
+From the repo root on a Linux server:
+
+```bash
+cp .env.example .env
+nano .env
+bash scripts/install-and-run-linux.sh
+```
+
+`scripts/install-and-run-linux.sh` verifies Docker and the Compose plugin are
+installed, requires that `.env` exists and has real (non-placeholder) values for
+the required keys, stops any leftover host nginx / backend systemd service from an
+older hybrid-mode install, then runs `docker compose up -d --build` and waits for
+every service to report running. Re-run it after a `git pull` to deploy updates --
+`docker compose up -d --build` only rebuilds what changed.
+
+If you'd rather run the underlying commands yourself instead of the script:
 
 ```bash
 cp .env.example .env
@@ -138,12 +153,4 @@ Useful server checks:
 docker compose ps
 docker compose logs -f caddy
 docker compose logs -f backend
-```
-
-## Linux Hybrid Server
-
-If you prefer PostgreSQL in Docker but backend/frontend on host systemd services, run:
-
-```bash
-bash scripts/install-and-run-linux.sh
 ```
