@@ -1,3 +1,8 @@
+:host {
+  background: radial-gradient(circle at top right, var(--soft-gold), transparent 55%);
+  display: block;
+}
+
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 440px);
@@ -15,10 +20,9 @@
 
 .eyebrow {
   color: var(--accent-maroon);
-  font-weight: 700;
+  font-weight: 800;
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: 0;
 }
 
 h1 {
@@ -42,6 +46,12 @@ h1 {
   overflow: hidden;
   box-shadow: var(--shadow);
   background: var(--surface);
+  transform: rotate(-2deg);
+  transition: transform 0.2s ease;
+}
+
+.hero-media:hover {
+  transform: rotate(0deg);
 }
 
 .hero-media img {
@@ -65,6 +75,12 @@ h1 {
   border-top: 4px solid var(--palette-gold);
   border-radius: 8px;
   padding: 20px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feature-strip article:hover {
+  box-shadow: 0 18px 36px rgba(64, 15, 15, 0.18);
+  transform: translateY(-2px);
 }
 
 .feature-strip h2 {
