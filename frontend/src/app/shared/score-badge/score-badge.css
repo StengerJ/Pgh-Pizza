@@ -1,0 +1,41 @@
+:host {
+  display: inline-flex;
+}
+
+.score-badge {
+  align-items: center;
+  background: var(--surface);
+  border-radius: 999px;
+  border: 3px solid var(--muted);
+  display: grid;
+  height: 64px;
+  justify-items: center;
+  place-content: center;
+  width: 64px;
+}
+
+.score-badge-number {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.score-badge-label {
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tier-high {
+  border-color: var(--palette-gold);
+}
+
+.tier-mid {
+  border-color: var(--accent-red);
+}
+
+.tier-low {
+  border-color: var(--muted);
+}

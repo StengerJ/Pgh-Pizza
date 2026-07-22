@@ -1,0 +1,9 @@
+<div
+  class="score-badge"
+  [class.tier-high]="tier === 'high'"
+  [class.tier-mid]="tier === 'mid'"
+  [class.tier-low]="tier === 'low'"
+>
+  <span class="score-badge-number">{{ display }}</span>
+  <span class="score-badge-label">{{ label }}</span>
+</div>
