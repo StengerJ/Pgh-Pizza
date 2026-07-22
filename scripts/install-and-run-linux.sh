@@ -74,6 +74,11 @@ cleanup_legacy_hybrid_state() {
     echo "Found active host nginx from a prior hybrid install -- stopping and disabling it so Caddy can bind 80/443."
     $SUDO systemctl disable --now nginx || true
   fi
+
+  if $SUDO docker inspect "pgh-pizza-postgres" >/dev/null 2>&1; then
+    echo "Found leftover standalone pgh-pizza-postgres container from a prior hybrid install -- removing it so Docker Compose can manage it (its data volume is preserved)."
+    $SUDO docker rm -f "pgh-pizza-postgres" || true
+  fi
 }
 
 build_and_launch() {
