@@ -1,4 +1,4 @@
-<section class="page table-page contributors-page">
+<section class="page contributors-page">
   <header class="page-header">
     <div>
       <h1>Contributors</h1>
@@ -10,45 +10,30 @@
     <p class="status error">{{ errorMessage() }}</p>
   }
 
-  <div class="table-wrap contributors-table">
-    <table aria-label="Contributors table">
-      <thead>
-        <tr>
-          <th>Contributor</th>
-          <th>Ratings</th>
-          <th>Blog posts</th>
-        </tr>
-      </thead>
-      <tbody>
-        @if (!loading() && contributors().length === 0) {
-          <tr>
-            <td colspan="3" class="empty">No contributors are available yet.</td>
-          </tr>
-        } @else {
-          @for (contributor of contributors(); track contributor.id) {
-            <tr>
-              <td data-label="Contributor">
-                <a class="contributor-link" [routerLink]="['/profiles', contributor.id]">
-                  @if (contributor.profilePictureUrl) {
-                    <img
-                      class="profile-thumb"
-                      [src]="contributor.profilePictureUrl"
-                      [alt]="contributor.displayName + ' profile picture'"
-                    >
-                  } @else {
-                    <span class="profile-thumb fallback" aria-hidden="true">
-                      {{ profileInitials(contributor.displayName) }}
-                    </span>
-                  }
-                  <span>{{ contributor.displayName }}</span>
-                </a>
-              </td>
-              <td data-label="Ratings">{{ contributor.ratingCount }}</td>
-              <td data-label="Blog posts">{{ contributor.blogPostCount }}</td>
-            </tr>
+  <div class="contributors-grid" aria-label="Contributors">
+    @if (!loading() && contributors().length === 0) {
+      <p class="status empty">No contributors are available yet.</p>
+    } @else {
+      @for (contributor of contributors(); track contributor.id) {
+        <a class="contributor-card" [routerLink]="['/profiles', contributor.id]">
+          @if (contributor.profilePictureUrl) {
+            <img
+              class="profile-thumb"
+              [src]="contributor.profilePictureUrl"
+              [alt]="contributor.displayName + ' profile picture'"
+            >
+          } @else {
+            <span class="profile-thumb fallback" aria-hidden="true">
+              {{ profileInitials(contributor.displayName) }}
+            </span>
           }
-        }
-      </tbody>
-    </table>
+          <span class="contributor-name">{{ contributor.displayName }}</span>
+          <span class="contributor-stats">
+            <span class="tag-chip">{{ contributor.ratingCount }} ratings</span>
+            <span class="tag-chip">{{ contributor.blogPostCount }} posts</span>
+          </span>
+        </a>
+      }
+    }
   </div>
 </section>

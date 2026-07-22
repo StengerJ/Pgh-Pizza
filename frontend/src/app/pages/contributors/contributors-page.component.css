@@ -3,39 +3,47 @@
 }
 
 .contributors-page {
-  --page-max-width: 960px;
+  --page-max-width: 1120px;
 }
 
-.contributors-table {
-  box-shadow: var(--shadow);
+.contributors-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
-.contributors-table table {
-  min-width: 720px;
+.contributors-grid > .status {
+  grid-column: 1 / -1;
 }
 
-.contributor-link {
+.contributor-card {
   align-items: center;
-  color: var(--accent-maroon);
-  display: inline-flex;
-  font-weight: 800;
-  gap: 12px;
-  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  padding: 20px;
+  text-align: center;
   text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.contributor-link:hover {
-  text-decoration: underline;
+.contributor-card:hover {
+  box-shadow: 0 22px 44px rgba(64, 15, 15, 0.22);
+  transform: translateY(-2px);
 }
 
 .profile-thumb {
   aspect-ratio: 1;
   border: 2px solid var(--soft-gold);
-  border-radius: 8px;
-  flex: 0 0 auto;
-  height: 52px;
+  border-radius: 999px;
+  height: 72px;
   object-fit: cover;
-  width: 52px;
+  width: 72px;
 }
 
 .profile-thumb.fallback {
@@ -47,22 +55,16 @@
   justify-content: center;
 }
 
-@media (max-width: 640px) {
-  .contributors-table {
-    box-shadow: none;
-  }
-
-  .contributors-table table {
-    min-width: 0;
-  }
-
-  .contributor-link {
-    width: 100%;
-  }
+.contributor-name {
+  color: var(--accent-maroon);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
-@media (min-width: 900px) {
-  .contributors-page {
-    --page-max-width: 1280px;
-  }
+.contributor-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
 }
