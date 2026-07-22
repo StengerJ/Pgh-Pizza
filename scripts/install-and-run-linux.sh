@@ -65,6 +65,8 @@ require_valid_env_file() {
 }
 
 cleanup_legacy_hybrid_state() {
+  local compose_project_label
+
   if $SUDO systemctl cat "${BACKEND_SERVICE_NAME}.service" >/dev/null 2>&1; then
     echo "Found legacy ${BACKEND_SERVICE_NAME}.service from a prior hybrid install -- stopping and disabling it."
     $SUDO systemctl disable --now "${BACKEND_SERVICE_NAME}.service" || true
@@ -76,8 +78,11 @@ cleanup_legacy_hybrid_state() {
   fi
 
   if $SUDO docker inspect "pgh-pizza-postgres" >/dev/null 2>&1; then
-    echo "Found leftover standalone pgh-pizza-postgres container from a prior hybrid install -- removing it so Docker Compose can manage it (its data volume is preserved)."
-    $SUDO docker rm -f "pgh-pizza-postgres" || true
+    compose_project_label="$($SUDO docker inspect --format '{{ index .Config.Labels "com.docker.compose.project" }}' "pgh-pizza-postgres" 2>/dev/null)"
+    if [ -z "$compose_project_label" ]; then
+      echo "Found leftover standalone pgh-pizza-postgres container from a prior hybrid install -- removing it so Docker Compose can manage it (its data volume is preserved)."
+      $SUDO docker rm -f "pgh-pizza-postgres" || true
+    fi
   fi
 }
 
