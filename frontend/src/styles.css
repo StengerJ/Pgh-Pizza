@@ -1,14 +1,16 @@
 :root {
   --palette-red: #d93240;
-  --palette-maroon: #8c2029;
+  --palette-maroon: #6f1620;
   --palette-gold: #f29f05;
   --palette-bright-red: #d92525;
   --palette-dark: #400f0f;
+  --palette-basil: #4c7a4a;
 
   --accent-red: var(--palette-red);
   --accent-maroon: var(--palette-maroon);
   --accent-yellow: var(--palette-gold);
   --accent-bright-red: var(--palette-bright-red);
+  --accent-basil: var(--palette-basil);
   --background: #fff8eb;
   --border: rgba(64, 15, 15, 0.16);
   --ink: var(--palette-dark);
@@ -16,8 +18,11 @@
   --on-accent: #fffdf8;
   --soft-red: rgba(217, 50, 64, 0.1);
   --soft-gold: rgba(242, 159, 5, 0.18);
+  --soft-basil: rgba(76, 122, 74, 0.14);
   --surface: #fffdf8;
   --shadow: 0 18px 40px rgba(64, 15, 15, 0.16);
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', Arial, Helvetica, sans-serif;
 }
 
 * {
@@ -32,9 +37,16 @@ html {
 body {
   background: var(--background);
   color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   margin: 0;
   min-height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
 }
 
 img,
@@ -258,10 +270,26 @@ tbody tr:last-child td {
   text-decoration: underline;
 }
 
+.tag-chip {
+  background: var(--soft-gold);
+  border-radius: 999px;
+  color: var(--ink);
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 6px 12px;
+}
+
+.tag-chip.value-chip {
+  background: var(--soft-basil);
+  color: var(--palette-dark);
+}
+
 .content-block {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
+  box-shadow: var(--shadow);
   padding: 24px;
 }
 
