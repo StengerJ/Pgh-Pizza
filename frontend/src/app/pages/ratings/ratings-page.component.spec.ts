@@ -39,27 +39,36 @@ describe('RatingsPage', () => {
     request.flush([]);
   });
 
-  it('should render the required rating table columns', () => {
+  it('should render each rating as a card with its key details', () => {
     fixture.detectChanges();
-    httpTesting.expectOne('/api/ratings').flush([]);
+    httpTesting.expectOne('/api/ratings').flush([
+      {
+        id: '1',
+        creatorId: 'user-1',
+        creator: 'Joshua Stenger',
+        restaurantName: 'Fiori Pizza',
+        location: 'Brookline',
+        sauce: 'Sweet',
+        toppings: 'Pepperoni',
+        crust: 'Crisp',
+        overallRating: 9.1,
+        affordabilityRating: 8.5,
+        comments: 'Classic Pittsburgh slice'
+      }
+    ]);
     fixture.detectChanges();
 
     const nativeElement = fixture.nativeElement as HTMLElement;
-    const headers = Array.from(nativeElement.querySelectorAll('th')).map((header) =>
-      header.textContent?.trim()
-    );
+    const cards = nativeElement.querySelectorAll('app-rating-card');
 
-    expect(headers).toEqual([
-      'Restaurant Name',
-      'Location',
-      'Sauce',
-      'Toppings',
-      'Crust',
-      'Overall Rating',
-      'Affordability Rating',
-      'Contributor',
-      'Comments'
-    ]);
+    expect(cards.length).toBe(1);
+    expect(nativeElement.textContent).toContain('Fiori Pizza');
+    expect(nativeElement.textContent).toContain('Brookline');
+    expect(nativeElement.textContent).toContain('Sweet');
+    expect(nativeElement.textContent).toContain('Pepperoni');
+    expect(nativeElement.textContent).toContain('Crisp');
+    expect(nativeElement.textContent).toContain('9.1');
+    expect(nativeElement.textContent).toContain('Classic Pittsburgh slice');
   });
 
   it('should show the empty state instead of an error box when ratings fail to load', () => {

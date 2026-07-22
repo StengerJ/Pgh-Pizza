@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 import { Rating } from '../../core/models/rating.model';
 import { AuthService } from '../../core/services/auth.service';
 import { RatingsService } from '../../core/services/ratings.service';
+import { RatingCard } from '../../shared/rating-card/rating-card';
 
 type RatingFilterKey =
   | 'restaurantName'
@@ -34,7 +35,7 @@ const emptyFilters: RatingFilters = {
 @Component({
   selector: 'app-ratings-page',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, RatingCard],
   templateUrl: './ratings-page.component.html',
   styleUrls: ['./ratings-page.component.css']
 })
@@ -87,10 +88,6 @@ export class RatingsPage implements OnInit {
   canManage(rating: Rating): boolean {
     const user = this.auth.currentUser();
     return Boolean(user && (user.role === 'ADMIN' || user.id === rating.creatorId));
-  }
-
-  showActionsColumn(): boolean {
-    return this.auth.isLoggedIn();
   }
 
   setFilter(key: RatingFilterKey, event: Event): void {
