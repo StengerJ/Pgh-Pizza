@@ -1,0 +1,85 @@
+:host {
+  display: block;
+}
+
+.rating-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rating-card:hover {
+  box-shadow: 0 22px 44px rgba(64, 15, 15, 0.22);
+  transform: translateY(-2px);
+}
+
+.rating-card-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.rating-card-header h3 {
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.rating-card-location {
+  color: var(--muted);
+  font-weight: 700;
+  margin: 4px 0 0;
+}
+
+.rating-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rating-card-comments {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.rating-card-footer {
+  align-items: center;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  padding-top: 14px;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.row-actions .button {
+  min-height: 36px;
+  padding: 6px 10px;
+}
+
+@media (max-width: 420px) {
+  .rating-card-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .row-actions,
+  .row-actions .button {
+    width: 100%;
+  }
+}

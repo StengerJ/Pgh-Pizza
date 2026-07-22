@@ -1,0 +1,42 @@
+<article class="rating-card">
+  <header class="rating-card-header">
+    <div>
+      <h3>{{ rating.restaurantName }}</h3>
+      <p class="rating-card-location">{{ rating.location }}</p>
+    </div>
+    <app-score-badge [score]="rating.overallRating" label="Overall"></app-score-badge>
+  </header>
+
+  <ul class="rating-card-tags" aria-label="Pizza details">
+    <li class="tag-chip value-chip">Value {{ rating.affordabilityRating }}/10</li>
+    <li class="tag-chip">Sauce: {{ rating.sauce }}</li>
+    <li class="tag-chip">Crust: {{ rating.crust }}</li>
+    <li class="tag-chip">Toppings: {{ rating.toppings }}</li>
+  </ul>
+
+  <p class="rating-card-comments">{{ rating.comments }}</p>
+
+  <footer class="rating-card-footer">
+    <p class="meta">
+      @if (rating.creatorId) {
+        <a class="profile-link" [routerLink]="['/profiles', rating.creatorId]">{{ rating.creator }}</a>
+      } @else {
+        {{ rating.creator }}
+      }
+    </p>
+
+    @if (canManage) {
+      <div class="row-actions">
+        <a class="button secondary" [routerLink]="['/ratings', rating.id, 'edit']">Edit</a>
+        <button
+          class="button danger"
+          type="button"
+          [disabled]="processing"
+          (click)="onRemove()"
+        >
+          Remove
+        </button>
+      </div>
+    }
+  </footer>
+</article>
