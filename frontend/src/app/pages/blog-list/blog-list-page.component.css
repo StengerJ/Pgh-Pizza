@@ -7,10 +7,17 @@
 .post-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
   display: grid;
   gap: 12px;
   padding: 20px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.post-card:hover {
+  box-shadow: 0 22px 44px rgba(64, 15, 15, 0.22);
+  transform: translateY(-2px);
 }
 
 .post-card h2,
