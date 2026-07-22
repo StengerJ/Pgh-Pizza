@@ -30,13 +30,18 @@
 }
 
 .brand-mark-slice {
-  fill: var(--palette-gold);
-  stroke: var(--accent-maroon);
-  stroke-width: 1;
+  fill: var(--accent-red);
+}
+
+.brand-mark-crust {
+  fill: none;
+  stroke: var(--palette-gold);
+  stroke-linecap: round;
+  stroke-width: 1.6;
 }
 
 .brand-mark-topping {
-  fill: var(--accent-red);
+  fill: var(--on-accent);
 }
 
 .navbar-links,
