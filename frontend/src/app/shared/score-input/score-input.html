@@ -1,4 +1,4 @@
-<div class="score-input" [class.unset]="value() === null">
+<div class="score-input" [class.unset]="value() === null" (focusout)="onFocusOut($event)">
   <div class="score-input-header">
     <label [for]="inputId">{{ label }}</label>
     <span class="score-input-readout" aria-hidden="true">
@@ -15,10 +15,11 @@
       [step]="step"
       [value]="sliderValue()"
       [disabled]="disabled()"
-      [attr.aria-label]="label + ' slider'"
+      [attr.aria-label]="label"
+      [attr.aria-describedby]="describedByIds"
+      [attr.aria-invalid]="invalid"
       [attr.aria-valuetext]="value() === null ? 'Not set' : (value() | score) + ' out of 10'"
       (input)="onSlider($event)"
-      (blur)="onBlur()"
     >
     <input
       #numberBox
@@ -32,15 +33,14 @@
       [max]="max"
       [step]="step"
       [disabled]="disabled()"
-      [attr.aria-describedby]="describedBy"
+      [attr.aria-describedby]="describedByIds"
       [attr.aria-invalid]="invalid"
       (input)="onNumber($event)"
-      (blur)="onBlur()"
       (wheel)="onWheel($event)"
     >
   </div>
 
-  <div class="score-input-anchors" aria-hidden="true">
+  <div class="score-input-anchors" [id]="scaleId">
     <span>1 = {{ lowLabel }}</span>
     <span>10 = {{ highLabel }}</span>
   </div>

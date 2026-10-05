@@ -75,6 +75,26 @@ describe('ScoreInput', () => {
     expect(slider().value).toBe('9.2');
   });
 
+  it('should describe the scale to screen readers on both controls', () => {
+    const scale = el.querySelector('#overallScale');
+    expect(scale?.textContent).toContain('10 = Best in Pittsburgh');
+    expect(scale?.getAttribute('aria-hidden')).toBeNull();
+    expect(box().getAttribute('aria-describedby')).toContain('overallScale');
+    expect(slider().getAttribute('aria-describedby')).toContain('overallScale');
+    expect(slider().getAttribute('aria-label')).toBe('Overall');
+  });
+
+  it('should not mark the score touched while focus moves between its own controls', () => {
+    document.body.appendChild(el);
+    slider().focus();
+    box().focus();
+    expect(fixture.componentInstance.control.touched).toBeFalse();
+
+    box().blur();
+    expect(fixture.componentInstance.control.touched).toBeTrue();
+    el.remove();
+  });
+
   it('should drop focus on mouse wheel so scrolling cannot change the score', () => {
     document.body.appendChild(el);
     box().focus();

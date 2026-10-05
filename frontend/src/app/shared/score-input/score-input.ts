@@ -6,6 +6,7 @@ import {
   ViewChild,
   computed,
   forwardRef,
+  inject,
   signal
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -30,6 +31,7 @@ export class ScoreInput implements ControlValueAccessor, AfterViewInit {
   @Input() invalid = false;
 
   @ViewChild('numberBox') private numberBox?: ElementRef<HTMLInputElement>;
+  private readonly host = inject(ElementRef<HTMLElement>).nativeElement;
 
   readonly min = SCORE_MIN;
   readonly max = SCORE_MAX;
@@ -40,6 +42,14 @@ export class ScoreInput implements ControlValueAccessor, AfterViewInit {
 
   private onChange: (value: number | null) => void = () => undefined;
   private onTouched: () => void = () => undefined;
+
+  get scaleId(): string {
+    return `${this.inputId}Scale`;
+  }
+
+  get describedByIds(): string {
+    return [this.scaleId, this.describedBy].filter(Boolean).join(' ');
+  }
 
   ngAfterViewInit(): void {
     this.writeNumberBox();
@@ -72,8 +82,11 @@ export class ScoreInput implements ControlValueAccessor, AfterViewInit {
     this.update(toScore((event.target as HTMLInputElement).value));
   }
 
-  onBlur(): void {
-    this.onTouched();
+  onFocusOut(event: FocusEvent): void {
+    // Moving between the slider and number box is still inside the score; only leaving it counts.
+    if (!this.host.contains(event.relatedTarget as Node | null)) {
+      this.onTouched();
+    }
   }
 
   onWheel(event: WheelEvent): void {

@@ -23,6 +23,13 @@ describe('ScoreBadge', () => {
     expect(nativeElement.textContent).toContain('9.0');
   });
 
+  it('should round the same way as every other score display', () => {
+    fixture.componentRef.setInput('score', 6.85);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('6.9');
+  });
+
   it('should render the label', () => {
     fixture.componentRef.setInput('score', 9);
     fixture.componentRef.setInput('label', 'Overall');
