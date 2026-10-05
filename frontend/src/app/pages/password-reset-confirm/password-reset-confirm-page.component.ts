@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -52,8 +53,10 @@ export class PasswordResetConfirmPage {
         this.submitting.set(false);
         this.submitted.set(false);
       },
-      error: () => {
-        this.errorMessage.set('Password could not be updated. The token may be invalid or expired.');
+      error: (error: unknown) => {
+        this.errorMessage.set(
+          apiErrorMessage(error, 'Password could not be updated. Request a new reset link and try again.')
+        );
         this.submitting.set(false);
       }
     });

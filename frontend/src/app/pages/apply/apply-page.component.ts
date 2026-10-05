@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { ApplicationsService } from '../../core/services/applications.service';
 
 @Component({
@@ -61,8 +62,10 @@ export class ApplyPage {
           this.submitted.set(false);
           this.submitting.set(false);
         },
-        error: () => {
-          this.errorMessage.set('Application could not be submitted. Please try again later.');
+        error: (error: unknown) => {
+          this.errorMessage.set(
+            apiErrorMessage(error, 'Application could not be submitted. Please try again later.')
+          );
           this.submitting.set(false);
         }
       });

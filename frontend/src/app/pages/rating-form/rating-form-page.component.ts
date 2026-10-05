@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AuthService } from '../../core/services/auth.service';
 import { RatingsService } from '../../core/services/ratings.service';
 
@@ -105,8 +106,10 @@ export class RatingFormPage implements OnInit {
         this.submitting.set(false);
         void this.router.navigateByUrl('/ratings');
       },
-      error: () => {
-        this.errorMessage.set('Rating could not be saved. Please try again later.');
+      error: (error: unknown) => {
+        this.errorMessage.set(
+          apiErrorMessage(error, 'Rating could not be saved. Please try again later.')
+        );
         this.submitting.set(false);
       }
     });

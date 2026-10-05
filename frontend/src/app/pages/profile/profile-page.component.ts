@@ -3,6 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { BlogPost } from '../../core/models/blog-post.model';
 import { UserProfile } from '../../core/models/profile.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -99,8 +100,10 @@ export class ProfilePage implements OnInit {
         this.successMessage.set('Profile updated.');
         this.auth.refreshCurrentUser().subscribe({ error: () => undefined });
       },
-      error: () => {
-        this.errorMessage.set('Profile could not be saved.');
+      error: (error: unknown) => {
+        this.errorMessage.set(
+          apiErrorMessage(error, 'Profile could not be saved. Please try again.')
+        );
         this.saving.set(false);
       }
     });

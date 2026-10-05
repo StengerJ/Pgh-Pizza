@@ -3,6 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { BlogPost } from '../../core/models/blog-post.model';
 import { AuthService } from '../../core/services/auth.service';
 import { BlogService } from '../../core/services/blog.service';
@@ -63,8 +64,10 @@ export class BlogListPage implements OnInit {
         );
         this.setProcessing(postId, false);
       },
-      error: () => {
-        this.errorMessage.set('Blog post could not be removed.');
+      error: (error: unknown) => {
+        this.errorMessage.set(
+          apiErrorMessage(error, 'Blog post could not be removed. Please try again.')
+        );
         this.setProcessing(postId, false);
       }
     });

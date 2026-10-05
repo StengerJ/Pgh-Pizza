@@ -1,0 +1,45 @@
+import { HttpErrorResponse } from '@angular/common/http';
+
+import { apiErrorMessage } from './api-error-message';
+
+describe('apiErrorMessage', () => {
+  const fallback = 'Something went wrong.';
+  const httpError = (status: number, error: unknown) =>
+    new HttpErrorResponse({ status, error, url: '/api/x' });
+
+  it('should return the backend message for a 409 conflict', () => {
+    expect(apiErrorMessage(httpError(409, { message: 'Blog post slug already exists' }), fallback))
+      .toBe('Blog post slug already exists.');
+  });
+
+  it('should return the backend message for a 404', () => {
+    expect(apiErrorMessage(httpError(404, { message: 'Rating not found' }), fallback))
+      .toBe('Rating not found.');
+  });
+
+  it('should turn a 400 validation message into a field hint', () => {
+    expect(apiErrorMessage(httpError(400, { message: 'slug must match "^[a-z0-9]+$"' }), fallback))
+      .toBe('Check the slug field and try again.');
+  });
+
+  it('should explain network failures', () => {
+    expect(apiErrorMessage(httpError(0, null), fallback))
+      .toBe('PGH Pizza could not be reached. Check your connection and try again.');
+  });
+
+  it('should explain forbidden responses', () => {
+    expect(apiErrorMessage(httpError(403, { message: 'Forbidden' }), fallback))
+      .toBe('Your account does not have permission to do that.');
+  });
+
+  it('should fall back when the body is not JSON', () => {
+    expect(apiErrorMessage(httpError(409, '<html>bad gateway</html>'), fallback)).toBe(fallback);
+    expect(apiErrorMessage(httpError(409, null), fallback)).toBe(fallback);
+  });
+
+  it('should fall back for 500 and non-HTTP errors', () => {
+    expect(apiErrorMessage(httpError(500, { message: 'Unexpected server error' }), fallback))
+      .toBe(fallback);
+    expect(apiErrorMessage(new Error('boom'), fallback)).toBe(fallback);
+  });
+});

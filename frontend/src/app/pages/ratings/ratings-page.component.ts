@@ -2,6 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { Rating } from '../../core/models/rating.model';
 import { AuthService } from '../../core/services/auth.service';
 import { RatingsService } from '../../core/services/ratings.service';
@@ -120,8 +121,10 @@ export class RatingsPage implements OnInit {
         );
         this.setProcessing(ratingId, false);
       },
-      error: () => {
-        this.errorMessage.set('Rating could not be removed.');
+      error: (error: unknown) => {
+        this.errorMessage.set(
+          apiErrorMessage(error, 'Rating could not be removed. Please try again.')
+        );
         this.setProcessing(ratingId, false);
       }
     });

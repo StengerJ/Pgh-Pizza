@@ -7,6 +7,7 @@ import {
   AdminContributorBlogPost,
   AdminContributorRating
 } from '../../core/models/admin-contributor.model';
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AdminUser } from '../../core/models/admin-user.model';
 import { ApplicationStatus, ContributorApplication } from '../../core/models/application.model';
 import { UserRole } from '../../core/models/user.model';
@@ -82,7 +83,7 @@ export class AdminApplicationsPage implements OnInit {
         );
         this.finishAction(key, 'Rating removed.');
       },
-      error: () => this.failAction(key, 'Rating could not be removed.')
+      error: (error: unknown) => this.failAction(key, error, 'Rating could not be removed.')
     });
   }
 
@@ -111,7 +112,7 @@ export class AdminApplicationsPage implements OnInit {
         );
         this.finishAction(key, 'Blog post removed.');
       },
-      error: () => this.failAction(key, 'Blog post could not be removed.')
+      error: (error: unknown) => this.failAction(key, error, 'Blog post could not be removed.')
     });
   }
 
@@ -131,7 +132,7 @@ export class AdminApplicationsPage implements OnInit {
         this.users.update((users) => users.filter((user) => user.id !== contributor.id));
         this.finishAction(key, 'Contributor removed.');
       },
-      error: () => this.failAction(key, 'Contributor could not be removed.')
+      error: (error: unknown) => this.failAction(key, error, 'Contributor could not be removed.')
     });
   }
 
@@ -156,7 +157,7 @@ export class AdminApplicationsPage implements OnInit {
         this.loadContributors();
         this.finishAction(key, 'User permission updated.');
       },
-      error: () => this.failAction(key, 'User permission could not be updated.')
+      error: (error: unknown) => this.failAction(key, error, 'User permission could not be updated.')
     });
   }
 
@@ -251,7 +252,7 @@ export class AdminApplicationsPage implements OnInit {
         }
         this.finishAction(key, `Application ${status.toLowerCase()}.`);
       },
-      error: () => this.failAction(key, 'Application status could not be updated.')
+      error: (error: unknown) => this.failAction(key, error, 'Application status could not be updated.')
     });
   }
 
@@ -266,8 +267,8 @@ export class AdminApplicationsPage implements OnInit {
     this.setProcessing(key, false);
   }
 
-  private failAction(key: string, message: string): void {
-    this.errorMessage.set(message);
+  private failAction(key: string, error: unknown, fallback: string): void {
+    this.errorMessage.set(apiErrorMessage(error, fallback));
     this.setProcessing(key, false);
   }
 
