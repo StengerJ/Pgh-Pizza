@@ -2,13 +2,17 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, convertToParamMap, provideRouter } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 
 import { LoginPage } from './login-page.component';
 
 describe('LoginPage', () => {
+  let queryParamMap$: BehaviorSubject<ParamMap>;
+
   const setup = async (queryParams: Record<string, string>) => {
     localStorage.clear();
+    queryParamMap$ = new BehaviorSubject(convertToParamMap(queryParams));
     await TestBed.configureTestingModule({
       imports: [LoginPage],
       providers: [
@@ -18,7 +22,10 @@ describe('LoginPage', () => {
         provideHttpClientTesting(),
         {
           provide: ActivatedRoute,
-          useValue: { snapshot: { queryParamMap: convertToParamMap(queryParams) } }
+          useValue: {
+            snapshot: { queryParamMap: convertToParamMap(queryParams) },
+            queryParamMap: queryParamMap$
+          }
         }
       ]
     }).compileComponents();
@@ -52,6 +59,17 @@ describe('LoginPage', () => {
   it('should explain that the session expired when redirected for that reason', async () => {
     expect(await setup({ reason: 'expired', returnUrl: '/blog/new' }))
       .toContain('Your session expired. Log in again to pick up where you left off.');
+  });
+
+  it('should show the expiry message when redirected while already on the login page', async () => {
+    await setup({});
+    const fixture = TestBed.createComponent(LoginPage);
+    fixture.detectChanges();
+
+    queryParamMap$.next(convertToParamMap({ reason: 'expired' }));
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Your session expired');
   });
 
   it('should not show the expiry message on a normal visit', async () => {

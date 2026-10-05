@@ -94,3 +94,13 @@
   gap: 8px;
   margin-left: auto;
 }
+
+@media (max-width: 640px) {
+  .sort-control {
+    margin-left: 0;
+  }
+
+  .sort-control select {
+    flex: 1;
+  }
+}

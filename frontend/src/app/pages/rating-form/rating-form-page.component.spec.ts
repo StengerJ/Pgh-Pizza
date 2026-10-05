@@ -72,6 +72,17 @@ describe('RatingFormPage', () => {
     request.flush({});
   });
 
+  it('should only point a field at its error message while the error is shown', () => {
+    const fixture = TestBed.createComponent(RatingFormPage);
+    fixture.detectChanges();
+    const input = (fixture.nativeElement as HTMLElement).querySelector('#restaurantName')!;
+    expect(input.hasAttribute('aria-describedby')).toBeFalse();
+
+    fixture.componentInstance.form.controls.restaurantName.markAsTouched();
+    fixture.detectChanges();
+    expect(input.getAttribute('aria-describedby')).toBe('restaurantNameError');
+  });
+
   it('should show a specific message for an out-of-range score', () => {
     const fixture = TestBed.createComponent(RatingFormPage);
     fixture.detectChanges();

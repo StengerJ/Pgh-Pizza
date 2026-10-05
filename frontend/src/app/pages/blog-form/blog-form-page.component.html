@@ -24,7 +24,7 @@
           name="title"
           type="text"
           autocomplete="off"
-          aria-describedby="titleError"
+          [attr.aria-describedby]="form.controls.title.touched && form.controls.title.invalid ? 'titleError' : null"
           [attr.aria-invalid]="form.controls.title.touched && form.controls.title.invalid"
           formControlName="title"
         >
@@ -40,7 +40,7 @@
           name="location"
           type="text"
           autocomplete="off"
-          aria-describedby="locationError"
+          [attr.aria-describedby]="form.controls.location.touched && form.controls.location.invalid ? 'locationError' : null"
           [attr.aria-invalid]="form.controls.location.touched && form.controls.location.invalid"
           formControlName="location"
         >
@@ -90,7 +90,7 @@
         id="body"
         name="body"
         autocomplete="off"
-        aria-describedby="bodyError"
+        [attr.aria-describedby]="form.controls.body.touched && form.controls.body.invalid ? 'bodyError' : null"
         [attr.aria-invalid]="form.controls.body.touched && form.controls.body.invalid"
         formControlName="body"
       ></textarea>

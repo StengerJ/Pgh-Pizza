@@ -24,7 +24,7 @@
           name="restaurantName"
           type="text"
           autocomplete="off"
-          aria-describedby="restaurantNameError"
+          [attr.aria-describedby]="form.controls.restaurantName.touched && form.controls.restaurantName.invalid ? 'restaurantNameError' : null"
           [attr.aria-invalid]="form.controls.restaurantName.touched && form.controls.restaurantName.invalid"
           formControlName="restaurantName"
         >
@@ -40,7 +40,7 @@
           name="location"
           type="text"
           autocomplete="off"
-          aria-describedby="locationError"
+          [attr.aria-describedby]="form.controls.location.touched && form.controls.location.invalid ? 'locationError' : null"
           [attr.aria-invalid]="form.controls.location.touched && form.controls.location.invalid"
           formControlName="location"
         >
@@ -61,7 +61,7 @@
               [label]="score.label"
               [lowLabel]="score.low"
               [highLabel]="score.high"
-              [describedBy]="score.key + 'Error'"
+              [describedBy]="showScoreError(score.key) ? score.key + 'Error' : null"
               [invalid]="showScoreError(score.key)"
               [formControlName]="score.key"
             ></app-score-input>
@@ -80,7 +80,7 @@
               [label]="score.label"
               lowLabel="Poor"
               highLabel="Excellent"
-              [describedBy]="score.key + 'Error'"
+              [describedBy]="showScoreError(score.key) ? score.key + 'Error' : null"
               [invalid]="showScoreError(score.key)"
               [formControlName]="score.key"
             ></app-score-input>
@@ -98,7 +98,7 @@
         id="comments"
         name="comments"
         autocomplete="off"
-        aria-describedby="commentsError"
+        [attr.aria-describedby]="form.controls.comments.touched && form.controls.comments.invalid ? 'commentsError' : null"
         [attr.aria-invalid]="form.controls.comments.touched && form.controls.comments.invalid"
         formControlName="comments"
       ></textarea>

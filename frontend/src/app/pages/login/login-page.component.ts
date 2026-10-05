@@ -1,6 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 
@@ -23,7 +25,11 @@ export class LoginPage {
   });
 
   readonly submitting = signal(false);
-  readonly sessionExpired = this.route.snapshot.queryParamMap.get('reason') === 'expired';
+  // Reactive so the banner also appears when an expired request redirects here from /login itself.
+  readonly sessionExpired = toSignal(
+    this.route.queryParamMap.pipe(map((params) => params.get('reason') === 'expired')),
+    { initialValue: this.route.snapshot.queryParamMap.get('reason') === 'expired' }
+  );
   readonly errorMessage = signal('');
 
   submit(): void {
