@@ -109,7 +109,7 @@ export class ScoreInput implements ControlValueAccessor, AfterViewInit {
   private writeNumberBox(): void {
     if (this.numberBox) {
       const value = this.value();
-      this.numberBox.nativeElement.value = value === null ? '' : String(value);
+      this.numberBox.nativeElement.value = value === null ? '' : value.toFixed(1);
     }
   }
 }

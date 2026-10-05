@@ -67,6 +67,14 @@ describe('ScoreInput', () => {
     expect(fixture.componentInstance.control.value).toBeNull();
   });
 
+  it('should show whole-number slider positions with one decimal in the number box', () => {
+    slider().value = '6';
+    slider().dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(box().value).toBe('6.0');
+  });
+
   it('should show values written by the form', () => {
     fixture.componentInstance.control.setValue(9.2);
     fixture.detectChanges();
