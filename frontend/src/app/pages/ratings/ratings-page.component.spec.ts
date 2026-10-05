@@ -243,4 +243,38 @@ describe('RatingsPage URL filters', () => {
     expect(text).toContain('Fiori');
     expect(text).not.toContain('Mineo');
   });
+
+  it('should restore score filter and sort selections from the query string', async () => {
+    localStorage.clear();
+    TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      imports: [RatingsPage],
+      providers: [
+        provideZonelessChangeDetection(),
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: { queryParamMap: convertToParamMap({ overallRating: '9', sort: 'overall' }) }
+          }
+        }
+      ]
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(RatingsPage);
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController).expectOne('/api/ratings').flush([
+      { id: '1', restaurantName: 'R1', location: 'L', sauce: '5', toppings: '5', crust: '5', overallRating: 9.5, affordabilityRating: 8, comments: 'c' },
+      { id: '2', restaurantName: 'R2', location: 'L', sauce: '5', toppings: '5', crust: '5', overallRating: 6, affordabilityRating: 8, comments: 'c' }
+    ]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector<HTMLSelectElement>('#ratingFilterOverall')!.value).toBe('9');
+    expect(el.querySelector<HTMLSelectElement>('#ratingSort')!.value).toBe('overall');
+    expect(el.textContent).not.toContain('R2');
+  });
 });

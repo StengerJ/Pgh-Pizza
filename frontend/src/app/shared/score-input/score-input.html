@@ -20,6 +20,7 @@
       [attr.aria-invalid]="invalid"
       [attr.aria-valuetext]="value() === null ? 'Not set' : (value() | score) + ' out of 10'"
       (input)="onSlider($event)"
+      (change)="onSliderCommit()"
     >
     <input
       #numberBox

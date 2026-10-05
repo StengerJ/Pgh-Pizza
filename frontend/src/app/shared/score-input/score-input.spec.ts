@@ -95,6 +95,14 @@ describe('ScoreInput', () => {
     el.remove();
   });
 
+  it('should commit the default position when an unset slider is clicked without moving', () => {
+    slider().dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.control.value).toBe(5.5);
+    expect(box().value).toBe('5.5');
+  });
+
   it('should drop focus on mouse wheel so scrolling cannot change the score', () => {
     document.body.appendChild(el);
     box().focus();

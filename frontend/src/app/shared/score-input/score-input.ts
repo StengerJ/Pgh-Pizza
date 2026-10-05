@@ -77,6 +77,14 @@ export class ScoreInput implements ControlValueAccessor, AfterViewInit {
     this.writeNumberBox();
   }
 
+  onSliderCommit(): void {
+    // Clicking an unset slider at its resting position fires change but no input.
+    if (this.value() === null) {
+      this.update(this.sliderValue());
+      this.writeNumberBox();
+    }
+  }
+
   onNumber(event: Event): void {
     // The number box is never re-bound while typing, so partial input like "8." survives.
     this.update(toScore((event.target as HTMLInputElement).value));
