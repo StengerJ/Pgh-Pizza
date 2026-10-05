@@ -48,7 +48,7 @@ describe('sessionExpiryInterceptor', () => {
   });
 
   it('should ignore 401 from the login endpoint', () => {
-    auth.token.and.returnValue(null);
+    auth.token.and.returnValue('still-stored-token');
     http.post('/api/auth/login', {}).subscribe({ error: () => undefined });
     httpTesting
       .expectOne('/api/auth/login')

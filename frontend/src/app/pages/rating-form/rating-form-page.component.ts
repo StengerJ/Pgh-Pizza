@@ -30,7 +30,7 @@ export class RatingFormPage implements OnInit, HasUnsavedChanges {
   private readonly auth = inject(AuthService);
   private readonly ratingsService = inject(RatingsService);
   private readonly router = inject(Router);
-  private readonly host = inject(ElementRef<HTMLElement>).nativeElement;
+  private readonly host: HTMLElement = inject(ElementRef).nativeElement;
   private editingRatingId: string | null = null;
   private saved = false;
 

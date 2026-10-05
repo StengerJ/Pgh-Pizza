@@ -15,7 +15,7 @@ import { ApplicationsService } from '../../core/services/applications.service';
 export class ApplyPage {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly applicationsService = inject(ApplicationsService);
-  private readonly host = inject(ElementRef<HTMLElement>).nativeElement;
+  private readonly host: HTMLElement = inject(ElementRef).nativeElement;
 
   readonly form = this.fb.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(320)]],

@@ -24,7 +24,7 @@ export function apiErrorMessage(error: unknown, fallback: string): string {
 
   if (error.status === 400) {
     const field = message.split(' ')[0];
-    return /^[A-Za-z]+$/.test(field) ? `Check the ${field} field and try again.` : fallback;
+    return /^[A-Za-z]+$/.test(field) ? `Check the ${fieldLabel(field)} and try again.` : fallback;
   }
 
   if (error.status === 404 || error.status === 409) {
@@ -32,6 +32,22 @@ export function apiErrorMessage(error: unknown, fallback: string): string {
   }
 
   return fallback;
+}
+
+const fieldLabels: Record<string, string> = {
+  overallRating: 'Overall score',
+  affordabilityRating: 'Value score',
+  sauce: 'Sauce score',
+  crust: 'Crust score',
+  toppings: 'Toppings score',
+  applicationReason: 'reason field',
+  youtubeUrl: 'YouTube URL field',
+  youtubeVideoId: 'YouTube URL field',
+  profilePictureUrl: 'profile picture'
+};
+
+function fieldLabel(field: string): string {
+  return fieldLabels[field] ?? `${field.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()} field`;
 }
 
 function backendMessage(body: unknown): string {

@@ -31,7 +31,11 @@
         </tr>
       </thead>
       <tbody>
-        @if (!loadingApplications() && !applicationsFailed() && pendingApplications().length === 0) {
+        @if (applicationsFailed()) {
+          <tr>
+            <td colspan="5" class="empty">Applications could not be loaded. Refresh the page to try again.</td>
+          </tr>
+        } @else if (!loadingApplications() && !applicationsFailed() && pendingApplications().length === 0) {
           <tr>
             <td colspan="5" class="empty">No applications are waiting for review.</td>
           </tr>
@@ -85,7 +89,11 @@
         </tr>
       </thead>
       <tbody>
-        @if (!loadingUsers() && !usersFailed() && users().length === 0) {
+        @if (usersFailed()) {
+          <tr>
+            <td colspan="5" class="empty">Users could not be loaded. Refresh the page to try again.</td>
+          </tr>
+        } @else if (!loadingUsers() && !usersFailed() && users().length === 0) {
           <tr>
             <td colspan="5" class="empty">No active users are available.</td>
           </tr>
@@ -159,7 +167,11 @@
         </tr>
       </thead>
       <tbody>
-        @if (!loadingContributors() && !contributorsFailed() && contributors().length === 0) {
+        @if (contributorsFailed()) {
+          <tr>
+            <td colspan="5" class="empty">Contributors could not be loaded. Refresh the page to try again.</td>
+          </tr>
+        } @else if (!loadingContributors() && !contributorsFailed() && contributors().length === 0) {
           <tr>
             <td colspan="5" class="empty">No active contributors are available.</td>
           </tr>

@@ -207,7 +207,6 @@ export class AdminApplicationsPage implements OnInit {
         error: () => {
           this.applications.set([]);
           this.applicationsFailed.set(true);
-          this.errorMessage.set('Applications could not be loaded.');
         }
       });
   }
@@ -223,7 +222,6 @@ export class AdminApplicationsPage implements OnInit {
         error: () => {
           this.contributors.set([]);
           this.contributorsFailed.set(true);
-          this.errorMessage.set('Contributors could not be loaded.');
         }
       });
   }
@@ -239,7 +237,6 @@ export class AdminApplicationsPage implements OnInit {
         error: () => {
           this.users.set([]);
           this.usersFailed.set(true);
-          this.errorMessage.set('Users could not be loaded.');
         }
       });
   }

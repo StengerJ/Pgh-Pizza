@@ -22,7 +22,7 @@ export class BlogFormPage implements OnInit, HasUnsavedChanges {
   private readonly blogService = inject(BlogService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly host = inject(ElementRef<HTMLElement>).nativeElement;
+  private readonly host: HTMLElement = inject(ElementRef).nativeElement;
   private static readonly slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
   private editingPostId: string | null = null;
   private saved = false;
@@ -109,7 +109,8 @@ export class BlogFormPage implements OnInit, HasUnsavedChanges {
     if (!slug) {
       this.form.controls.slug.setErrors({ pattern: true });
       this.form.controls.slug.markAsTouched();
-      focusFirstInvalid(this.host);
+      // The slug was valid a moment ago, so its ng-invalid class is not rendered yet.
+      this.host.querySelector<HTMLInputElement>('#slug')?.focus();
       return;
     }
 

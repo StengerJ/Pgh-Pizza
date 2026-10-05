@@ -22,6 +22,15 @@ describe('apiErrorMessage', () => {
       .toBe('Check the slug field and try again.');
   });
 
+  it('should name camelCase fields in plain words', () => {
+    expect(apiErrorMessage(httpError(400, { message: 'applicationReason size must be between 5 and 5000' }), fallback))
+      .toBe('Check the reason field and try again.');
+    expect(apiErrorMessage(httpError(400, { message: 'affordabilityRating must be less than or equal to 10.0' }), fallback))
+      .toBe('Check the Value score and try again.');
+    expect(apiErrorMessage(httpError(400, { message: 'restaurantName must not be blank' }), fallback))
+      .toBe('Check the restaurant name field and try again.');
+  });
+
   it('should explain network failures', () => {
     expect(apiErrorMessage(httpError(0, null), fallback))
       .toBe('PGH Pizza could not be reached. Check your connection and try again.');

@@ -49,6 +49,9 @@ describe('AdminApplicationsPage', () => {
     expect(text).not.toContain('No applications are waiting for review.');
     expect(text).not.toContain('No active users are available.');
     expect(text).not.toContain('No active contributors are available.');
+    expect(text).toContain('Applications could not be loaded. Refresh the page to try again.');
+    expect(text).toContain('Users could not be loaded. Refresh the page to try again.');
+    expect(text).toContain('Contributors could not be loaded. Refresh the page to try again.');
   });
 
   it('should reject the application once the admin confirms', () => {
