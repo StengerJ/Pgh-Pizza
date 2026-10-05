@@ -1,0 +1,47 @@
+<div class="score-input" [class.unset]="value() === null">
+  <div class="score-input-header">
+    <label [for]="inputId">{{ label }}</label>
+    <span class="score-input-readout" aria-hidden="true">
+      {{ value() === null ? 'Not set' : (value() | score) }}
+    </span>
+  </div>
+
+  <div class="score-input-controls">
+    <input
+      class="score-input-slider"
+      type="range"
+      [min]="min"
+      [max]="max"
+      [step]="step"
+      [value]="sliderValue()"
+      [disabled]="disabled()"
+      [attr.aria-label]="label + ' slider'"
+      [attr.aria-valuetext]="value() === null ? 'Not set' : (value() | score) + ' out of 10'"
+      (input)="onSlider($event)"
+      (blur)="onBlur()"
+    >
+    <input
+      #numberBox
+      class="score-input-number"
+      type="number"
+      inputmode="decimal"
+      autocomplete="off"
+      [id]="inputId"
+      [attr.name]="inputId"
+      [min]="min"
+      [max]="max"
+      [step]="step"
+      [disabled]="disabled()"
+      [attr.aria-describedby]="describedBy"
+      [attr.aria-invalid]="invalid"
+      (input)="onNumber($event)"
+      (blur)="onBlur()"
+      (wheel)="onWheel($event)"
+    >
+  </div>
+
+  <div class="score-input-anchors" aria-hidden="true">
+    <span>1 = {{ lowLabel }}</span>
+    <span>10 = {{ highLabel }}</span>
+  </div>
+</div>

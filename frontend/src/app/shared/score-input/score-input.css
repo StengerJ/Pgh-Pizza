@@ -1,0 +1,67 @@
+:host {
+  display: block;
+}
+
+.score-input {
+  display: grid;
+  gap: 8px;
+}
+
+.score-input-header {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+}
+
+.score-input-readout {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.unset .score-input-readout {
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+}
+
+.score-input-controls {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) 88px;
+}
+
+.score-input-slider {
+  accent-color: var(--accent-red);
+  min-height: 44px;
+  width: 100%;
+}
+
+.unset .score-input-slider {
+  opacity: 0.45;
+}
+
+.score-input-number {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  min-height: 44px;
+  padding: 8px 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.score-input-number[aria-invalid='true'] {
+  border-color: var(--accent-bright-red);
+}
+
+.score-input-anchors {
+  color: var(--muted);
+  display: flex;
+  font-size: 0.8rem;
+  justify-content: space-between;
+}
