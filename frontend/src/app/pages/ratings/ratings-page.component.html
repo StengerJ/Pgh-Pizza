@@ -58,24 +58,6 @@
           >
         </label>
 
-        @for (score of scoreFilters; track score.key) {
-          <label [for]="score.id">
-            {{ score.label }}
-            <select
-              [id]="score.id"
-              [attr.name]="score.id"
-              (change)="setFilter(score.key, $event)"
-            >
-              <option value="" [selected]="filters()[score.key] === ''">Any</option>
-              @for (minimum of minimumScores; track minimum) {
-                <option [value]="minimum" [selected]="filters()[score.key] === '' + minimum">
-                  {{ minimum }}+
-                </option>
-              }
-            </select>
-          </label>
-        }
-
         <label for="ratingFilterContributor">
           Contributor
           <input
@@ -100,6 +82,26 @@
             (input)="setFilter('comments', $event)"
           >
         </label>
+      </div>
+
+      <div class="filter-grid score-filter-grid">
+        @for (score of scoreFilters; track score.key) {
+          <label [for]="score.id">
+            {{ score.label }}
+            <select
+              [id]="score.id"
+              [attr.name]="score.id"
+              (change)="setFilter(score.key, $event)"
+            >
+              <option value="" [selected]="filters()[score.key] === ''">Any</option>
+              @for (minimum of minimumScores; track minimum) {
+                <option [value]="minimum" [selected]="filters()[score.key] === '' + minimum">
+                  {{ minimum }}+
+                </option>
+              }
+            </select>
+          </label>
+        }
       </div>
 
       <datalist id="ratingRestaurantOptions">
