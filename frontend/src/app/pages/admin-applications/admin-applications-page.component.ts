@@ -11,6 +11,7 @@ import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AdminUser } from '../../core/models/admin-user.model';
 import { ApplicationStatus, ContributorApplication } from '../../core/models/application.model';
 import { UserRole } from '../../core/models/user.model';
+import { ScorePipe } from '../../core/scores/score.pipe';
 import { AdminService } from '../../core/services/admin.service';
 import { ApplicationsService } from '../../core/services/applications.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -20,7 +21,7 @@ import { RatingsService } from '../../core/services/ratings.service';
 @Component({
   selector: 'app-admin-applications-page',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, ScorePipe],
   templateUrl: './admin-applications-page.component.html',
   styleUrls: ['./admin-applications-page.component.css']
 })

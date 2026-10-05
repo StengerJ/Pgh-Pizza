@@ -182,8 +182,8 @@
                           <strong>{{ rating.restaurantName }}</strong>
                           <span class="subtle">
                             {{ rating.location }} -
-                            Overall {{ rating.overallRating }}/10 -
-                            Affordability {{ rating.affordabilityRating }}/10 -
+                            Overall {{ rating.overallRating | score }}/10 -
+                            Value {{ rating.affordabilityRating | score }}/10 -
                             {{ rating.createdAt | date: 'mediumDate' }}
                           </span>
                         </div>

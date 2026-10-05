@@ -48,9 +48,9 @@ describe('RatingsPage', () => {
         creator: 'Joshua Stenger',
         restaurantName: 'Fiori Pizza',
         location: 'Brookline',
-        sauce: 'Sweet',
-        toppings: 'Pepperoni',
-        crust: 'Crisp',
+        sauce: '7',
+        toppings: '8.2',
+        crust: '9.1',
         overallRating: 9.1,
         affordabilityRating: 8.5,
         comments: 'Classic Pittsburgh slice'
@@ -64,9 +64,9 @@ describe('RatingsPage', () => {
     expect(cards.length).toBe(1);
     expect(nativeElement.textContent).toContain('Fiori Pizza');
     expect(nativeElement.textContent).toContain('Brookline');
-    expect(nativeElement.textContent).toContain('Sweet');
-    expect(nativeElement.textContent).toContain('Pepperoni');
-    expect(nativeElement.textContent).toContain('Crisp');
+    expect(nativeElement.textContent).toContain('Sauce 7.0');
+    expect(nativeElement.textContent).toContain('Toppings 8.2');
+    expect(nativeElement.textContent).toContain('Crust 9.1');
     expect(nativeElement.textContent).toContain('9.1');
     expect(nativeElement.textContent).toContain('Classic Pittsburgh slice');
   });
@@ -80,9 +80,9 @@ describe('RatingsPage', () => {
         creator: 'Joshua Stenger',
         restaurantName: 'Fiori Pizza',
         location: 'Brookline',
-        sauce: 'Sweet',
-        toppings: 'Pepperoni',
-        crust: 'Crisp',
+        sauce: '7',
+        toppings: '8.2',
+        crust: '9.1',
         overallRating: 9.1,
         affordabilityRating: 8.5,
         comments: 'Classic Pittsburgh slice'
@@ -93,9 +93,9 @@ describe('RatingsPage', () => {
         creator: 'Tema',
         restaurantName: 'Mineo Pizza',
         location: 'Squirrel Hill',
-        sauce: 'Tangy',
-        toppings: 'Mushroom',
-        crust: 'Chewy',
+        sauce: '6.5',
+        toppings: '5',
+        crust: '7.4',
         overallRating: 8.2,
         affordabilityRating: 7,
         comments: 'Great stop'
@@ -151,7 +151,7 @@ describe('RatingsPage', () => {
     const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
     fixture.detectChanges();
     httpTesting.expectOne('/api/ratings').flush([
-      { id: '1', restaurantName: 'Fiori', location: 'Brookline', sauce: 's', toppings: 't', crust: 'c', overallRating: 9, affordabilityRating: 8, comments: 'good' }
+      { id: '1', restaurantName: 'Fiori', location: 'Brookline', sauce: '5', toppings: '5', crust: '5', overallRating: 9, affordabilityRating: 8, comments: 'good' }
     ]);
     fixture.detectChanges();
 
@@ -187,8 +187,8 @@ describe('RatingsPage URL filters', () => {
     const fixture = TestBed.createComponent(RatingsPage);
     fixture.detectChanges();
     TestBed.inject(HttpTestingController).expectOne('/api/ratings').flush([
-      { id: '1', restaurantName: 'Fiori', location: 'Brookline', sauce: 's', toppings: 't', crust: 'c', overallRating: 9, affordabilityRating: 8, comments: 'good' },
-      { id: '2', restaurantName: 'Mineo', location: 'Squirrel Hill', sauce: 's', toppings: 't', crust: 'c', overallRating: 9, affordabilityRating: 8, comments: 'good' }
+      { id: '1', restaurantName: 'Fiori', location: 'Brookline', sauce: '5', toppings: '5', crust: '5', overallRating: 9, affordabilityRating: 8, comments: 'good' },
+      { id: '2', restaurantName: 'Mineo', location: 'Squirrel Hill', sauce: '5', toppings: '5', crust: '5', overallRating: 9, affordabilityRating: 8, comments: 'good' }
     ]);
     fixture.detectChanges();
 

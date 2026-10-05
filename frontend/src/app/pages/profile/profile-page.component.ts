@@ -7,12 +7,13 @@ import { apiErrorMessage } from '../../core/http/api-error-message';
 import { BlogPost } from '../../core/models/blog-post.model';
 import { UserProfile } from '../../core/models/profile.model';
 import { AuthService } from '../../core/services/auth.service';
+import { ScorePipe } from '../../core/scores/score.pipe';
 import { ProfileService } from '../../core/services/profile.service';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [DatePipe, ReactiveFormsModule, RouterLink],
+  imports: [DatePipe, ReactiveFormsModule, RouterLink, ScorePipe],
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.css']
 })

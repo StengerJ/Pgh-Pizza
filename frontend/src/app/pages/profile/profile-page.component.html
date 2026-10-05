@@ -121,7 +121,7 @@
               <th>Restaurant</th>
               <th>Location</th>
               <th>Overall</th>
-              <th>Affordability</th>
+              <th>Value</th>
               <th>Sauce</th>
               <th>Toppings</th>
               <th>Crust</th>
@@ -138,13 +138,13 @@
                 <tr>
                   <td data-label="Restaurant">{{ rating.restaurantName }}</td>
                   <td data-label="Location">{{ rating.location }}</td>
-                  <td class="rating-score" data-label="Overall">{{ rating.overallRating }}</td>
-                  <td class="rating-score" data-label="Affordability">
-                    {{ rating.affordabilityRating }}
+                  <td class="rating-score" data-label="Overall">{{ rating.overallRating | score }}</td>
+                  <td class="rating-score" data-label="Value">
+                    {{ rating.affordabilityRating | score }}
                   </td>
-                  <td class="rating-score" data-label="Sauce">{{ rating.sauce }}</td>
-                  <td class="rating-score" data-label="Toppings">{{ rating.toppings }}</td>
-                  <td class="rating-score" data-label="Crust">{{ rating.crust }}</td>
+                  <td class="rating-score" data-label="Sauce">{{ rating.sauce | score }}</td>
+                  <td class="rating-score" data-label="Toppings">{{ rating.toppings | score }}</td>
+                  <td class="rating-score" data-label="Crust">{{ rating.crust | score }}</td>
                   <td data-label="Comments">{{ rating.comments }}</td>
                 </tr>
               }
