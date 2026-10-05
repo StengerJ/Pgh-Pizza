@@ -23,6 +23,7 @@ export class LoginPage {
   });
 
   readonly submitting = signal(false);
+  readonly sessionExpired = this.route.snapshot.queryParamMap.get('reason') === 'expired';
   readonly errorMessage = signal('');
 
   submit(): void {

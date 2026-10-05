@@ -6,6 +6,10 @@
     </div>
   </header>
 
+  @if (sessionExpired) {
+    <p class="status" role="status">Your session expired. Log in again to pick up where you left off.</p>
+  }
+
   @if (errorMessage()) {
     <p class="status error">{{ errorMessage() }}</p>
   }
