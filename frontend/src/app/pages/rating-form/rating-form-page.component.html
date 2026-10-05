@@ -50,100 +50,47 @@
       </div>
     </div>
 
-    <div class="split-grid">
-      <div class="field">
-        <label for="sauce">Sauce</label>
-        <input
-          id="sauce"
-          name="sauce"
-          type="text"
-          autocomplete="off"
-          placeholder="Sweet, chunky…"
-          aria-describedby="sauceError"
-          [attr.aria-invalid]="form.controls.sauce.touched && form.controls.sauce.invalid"
-          formControlName="sauce"
-        >
-        @if (form.controls.sauce.touched && form.controls.sauce.invalid) {
-          <small id="sauceError">Describe the sauce (120 characters max).</small>
+    <fieldset class="score-group">
+      <legend>Scores</legend>
+
+      <div class="split-grid">
+        @for (score of mainScores; track score.key) {
+          <div class="field">
+            <app-score-input
+              [inputId]="score.key"
+              [label]="score.label"
+              [lowLabel]="score.low"
+              [highLabel]="score.high"
+              [describedBy]="score.key + 'Error'"
+              [invalid]="showScoreError(score.key)"
+              [formControlName]="score.key"
+            ></app-score-input>
+            @if (showScoreError(score.key)) {
+              <small [id]="score.key + 'Error'">{{ scoreError(score.key) }}</small>
+            }
+          </div>
         }
       </div>
 
-      <div class="field">
-        <label for="toppings">Toppings</label>
-        <input
-          id="toppings"
-          name="toppings"
-          type="text"
-          autocomplete="off"
-          placeholder="Pepperoni cups…"
-          aria-describedby="toppingsError"
-          [attr.aria-invalid]="form.controls.toppings.touched && form.controls.toppings.invalid"
-          formControlName="toppings"
-        >
-        @if (form.controls.toppings.touched && form.controls.toppings.invalid) {
-          <small id="toppingsError">Describe the toppings (160 characters max).</small>
+      <div class="sub-score-grid">
+        @for (score of subScores; track score.key) {
+          <div class="field">
+            <app-score-input
+              [inputId]="score.key"
+              [label]="score.label"
+              lowLabel="Poor"
+              highLabel="Excellent"
+              [describedBy]="score.key + 'Error'"
+              [invalid]="showScoreError(score.key)"
+              [formControlName]="score.key"
+            ></app-score-input>
+            @if (showScoreError(score.key)) {
+              <small [id]="score.key + 'Error'">{{ scoreError(score.key) }}</small>
+            }
+          </div>
         }
       </div>
-    </div>
-
-    <div class="field">
-      <label for="crust">Crust</label>
-      <input
-        id="crust"
-        name="crust"
-        type="text"
-        autocomplete="off"
-        placeholder="Thin and crisp…"
-        aria-describedby="crustError"
-        [attr.aria-invalid]="form.controls.crust.touched && form.controls.crust.invalid"
-        formControlName="crust"
-      >
-      @if (form.controls.crust.touched && form.controls.crust.invalid) {
-        <small id="crustError">Describe the crust (120 characters max).</small>
-      }
-    </div>
-
-    <div class="split-grid">
-      <div class="field">
-        <label for="overallRating">Overall Rating</label>
-        <input
-          id="overallRating"
-          name="overallRating"
-          type="number"
-          inputmode="decimal"
-          min="1"
-          max="10"
-          step="0.01"
-          autocomplete="off"
-          aria-describedby="overallRatingError"
-          [attr.aria-invalid]="form.controls.overallRating.touched && form.controls.overallRating.invalid"
-          formControlName="overallRating"
-        >
-        @if (form.controls.overallRating.touched && form.controls.overallRating.invalid) {
-          <small id="overallRatingError">Use a number from 1 to 10, decimals allowed.</small>
-        }
-      </div>
-
-      <div class="field">
-        <label for="affordabilityRating">Affordability Rating</label>
-        <input
-          id="affordabilityRating"
-          name="affordabilityRating"
-          type="number"
-          inputmode="decimal"
-          min="1"
-          max="10"
-          step="0.01"
-          autocomplete="off"
-          aria-describedby="affordabilityRatingError"
-          [attr.aria-invalid]="form.controls.affordabilityRating.touched && form.controls.affordabilityRating.invalid"
-          formControlName="affordabilityRating"
-        >
-        @if (form.controls.affordabilityRating.touched && form.controls.affordabilityRating.invalid) {
-          <small id="affordabilityRatingError">Use a number from 1 to 10, decimals allowed.</small>
-        }
-      </div>
-    </div>
+    </fieldset>
 
     <div class="field">
       <label for="comments">Comments</label>

@@ -6,12 +6,21 @@ import { focusFirstInvalid } from '../../core/forms/focus-first-invalid';
 import { HasUnsavedChanges } from '../../core/guards/unsaved-changes.guard';
 import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AuthService } from '../../core/services/auth.service';
+import { roundScore, scoreErrorMessage, scoreValidator, toScore } from '../../core/scores/score';
 import { RatingsService } from '../../core/services/ratings.service';
+import { ScoreInput } from '../../shared/score-input/score-input';
+
+type ScoreKey = 'overallRating' | 'affordabilityRating' | 'sauce' | 'crust' | 'toppings';
+
+function editableScore(value: unknown): number | null {
+  const score = toScore(value);
+  return score === null ? null : roundScore(score);
+}
 
 @Component({
   selector: 'app-rating-form-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, ScoreInput],
   templateUrl: './rating-form-page.component.html',
   styleUrls: ['./rating-form-page.component.css']
 })
@@ -28,11 +37,11 @@ export class RatingFormPage implements OnInit, HasUnsavedChanges {
   readonly form = this.fb.group({
     restaurantName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(160)]],
     location: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(180)]],
-    sauce: ['', [Validators.required, Validators.maxLength(120)]],
-    toppings: ['', [Validators.required, Validators.maxLength(160)]],
-    crust: ['', [Validators.required, Validators.maxLength(120)]],
-    overallRating: [8, [Validators.required, Validators.min(1), Validators.max(10)]],
-    affordabilityRating: [8, [Validators.required, Validators.min(1), Validators.max(10)]],
+    overallRating: this.fb.control<number | null>(null, scoreValidator),
+    affordabilityRating: this.fb.control<number | null>(null, scoreValidator),
+    sauce: this.fb.control<number | null>(null, scoreValidator),
+    crust: this.fb.control<number | null>(null, scoreValidator),
+    toppings: this.fb.control<number | null>(null, scoreValidator),
     comments: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5000)]]
   });
 
@@ -40,6 +49,17 @@ export class RatingFormPage implements OnInit, HasUnsavedChanges {
   readonly loading = signal(false);
   readonly errorMessage = signal('');
   readonly editing = signal(false);
+
+  readonly mainScores: { key: ScoreKey; label: string; low: string; high: string }[] = [
+    { key: 'overallRating', label: 'Overall', low: 'Skip it', high: 'Best in Pittsburgh' },
+    { key: 'affordabilityRating', label: 'Value', low: 'Poor value', high: 'Great value' }
+  ];
+
+  readonly subScores: { key: ScoreKey; label: string }[] = [
+    { key: 'sauce', label: 'Sauce' },
+    { key: 'crust', label: 'Crust' },
+    { key: 'toppings', label: 'Toppings' }
+  ];
 
   ngOnInit(): void {
     const ratingId = this.route.snapshot.paramMap.get('id');
@@ -63,11 +83,11 @@ export class RatingFormPage implements OnInit, HasUnsavedChanges {
         this.form.patchValue({
           restaurantName: rating.restaurantName,
           location: rating.location,
-          sauce: rating.sauce,
-          toppings: rating.toppings,
-          crust: rating.crust,
-          overallRating: rating.overallRating,
-          affordabilityRating: rating.affordabilityRating,
+          overallRating: editableScore(rating.overallRating),
+          affordabilityRating: editableScore(rating.affordabilityRating),
+          sauce: editableScore(rating.sauce),
+          crust: editableScore(rating.crust),
+          toppings: editableScore(rating.toppings),
           comments: rating.comments
         });
         this.loading.set(false);
@@ -77,6 +97,15 @@ export class RatingFormPage implements OnInit, HasUnsavedChanges {
         this.loading.set(false);
       }
     });
+  }
+
+  showScoreError(key: ScoreKey): boolean {
+    const control = this.form.controls[key];
+    return control.touched && control.invalid;
+  }
+
+  scoreError(key: ScoreKey): string {
+    return scoreErrorMessage(this.form.controls[key].errors);
   }
 
   hasUnsavedChanges(): boolean {
@@ -105,11 +134,11 @@ export class RatingFormPage implements OnInit, HasUnsavedChanges {
     const request = {
       restaurantName: value.restaurantName.trim(),
       location: value.location.trim(),
-      sauce: value.sauce.trim(),
-      toppings: value.toppings.trim(),
-      crust: value.crust.trim(),
-      overallRating: value.overallRating,
-      affordabilityRating: value.affordabilityRating,
+      overallRating: value.overallRating!,
+      affordabilityRating: value.affordabilityRating!,
+      sauce: value.sauce!.toFixed(1),
+      crust: value.crust!.toFixed(1),
+      toppings: value.toppings!.toFixed(1),
       comments: value.comments.trim()
     };
 
