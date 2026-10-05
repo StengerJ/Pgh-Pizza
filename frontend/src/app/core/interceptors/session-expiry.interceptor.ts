@@ -18,6 +18,12 @@ export const sessionExpiryInterceptor: HttpInterceptorFn = (request, next) => {
         error.status === 401 &&
         !request.url.includes('/auth/login')
       ) {
+        // Public reads work without a session, so drop the stale token and retry quietly.
+        if (request.method === 'GET' && !request.url.includes('/auth/me')) {
+          auth.logout();
+          return next(request.clone({ headers: request.headers.delete('Authorization') }));
+        }
+
         // A guard's request fails mid-navigation; return to where the user was headed.
         const navigation = router.currentNavigation();
         const target = navigation?.finalUrl ?? navigation?.extractedUrl;

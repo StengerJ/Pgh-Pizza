@@ -58,6 +58,33 @@ describe('sessionExpiryInterceptor', () => {
     expect(router.navigate).not.toHaveBeenCalled();
   });
 
+  it('should retry a public read without the stale token instead of redirecting', () => {
+    auth.token.and.returnValue('expired-token');
+    let ratings: unknown;
+    http
+      .get('/api/ratings', { headers: { Authorization: 'Bearer expired-token' } })
+      .subscribe((body) => (ratings = body));
+
+    httpTesting
+      .expectOne((req) => req.url === '/api/ratings' && req.headers.has('Authorization'))
+      .flush(null, { status: 401, statusText: 'Unauthorized' });
+    httpTesting
+      .expectOne((req) => req.url === '/api/ratings' && !req.headers.has('Authorization'))
+      .flush([{ id: 'r1' }]);
+
+    expect(ratings).toEqual([{ id: 'r1' }]);
+    expect(auth.logout).toHaveBeenCalled();
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should still redirect when the current-user check itself is rejected', () => {
+    auth.token.and.returnValue('expired-token');
+    http.get('/api/auth/me').subscribe({ error: () => undefined });
+    httpTesting.expectOne('/api/auth/me').flush(null, { status: 401, statusText: 'Unauthorized' });
+
+    expect(router.navigate).toHaveBeenCalled();
+  });
+
   it('should ignore 401 when no token was sent', () => {
     auth.token.and.returnValue(null);
     http.get('/api/ratings').subscribe({ error: () => undefined });
