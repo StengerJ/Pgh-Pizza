@@ -9,6 +9,10 @@ export function apiErrorMessage(error: unknown, fallback: string): string {
     return 'PGH Pizza could not be reached. Check your connection and try again.';
   }
 
+  if (error.status === 401) {
+    return 'Your session expired. Log in again, then retry. Copy any unsaved text first.';
+  }
+
   if (error.status === 403) {
     return 'Your account does not have permission to do that.';
   }

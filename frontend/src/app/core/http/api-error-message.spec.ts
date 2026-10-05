@@ -27,6 +27,11 @@ describe('apiErrorMessage', () => {
       .toBe('PGH Pizza could not be reached. Check your connection and try again.');
   });
 
+  it('should tell the user to log in again on 401', () => {
+    expect(apiErrorMessage(httpError(401, null), fallback))
+      .toBe('Your session expired. Log in again, then retry. Copy any unsaved text first.');
+  });
+
   it('should explain forbidden responses', () => {
     expect(apiErrorMessage(httpError(403, { message: 'Forbidden' }), fallback))
       .toBe('Your account does not have permission to do that.');
