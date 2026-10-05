@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 
 import { RatingsPage } from './ratings-page.component';
 
@@ -145,5 +145,56 @@ describe('RatingsPage', () => {
     expect(text).not.toContain('No ratings are available yet.');
     expect((fixture.nativeElement as HTMLElement).querySelector('.status.error[role="alert"]'))
       .not.toBeNull();
+  });
+
+  it('should write active filters to the URL query string', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/ratings').flush([
+      { id: '1', restaurantName: 'Fiori', location: 'Brookline', sauce: 's', toppings: 't', crust: 'c', overallRating: 9, affordabilityRating: 8, comments: 'good' }
+    ]);
+    fixture.detectChanges();
+
+    const input = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLInputElement>('#ratingFilterLocation')!;
+    input.value = 'Brook';
+    input.dispatchEvent(new Event('input'));
+
+    const [, extras] = navigate.calls.mostRecent().args;
+    expect(extras?.queryParams?.['location']).toBe('Brook');
+    expect(extras?.queryParams?.['sauce']).toBeNull();
+    expect(extras?.replaceUrl).toBeTrue();
+  });
+});
+
+describe('RatingsPage URL filters', () => {
+  it('should apply filters from the query string on first render', async () => {
+    localStorage.clear();
+    await TestBed.configureTestingModule({
+      imports: [RatingsPage],
+      providers: [
+        provideZonelessChangeDetection(),
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { queryParamMap: convertToParamMap({ location: 'Brookline' }) } }
+        }
+      ]
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(RatingsPage);
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController).expectOne('/api/ratings').flush([
+      { id: '1', restaurantName: 'Fiori', location: 'Brookline', sauce: 's', toppings: 't', crust: 'c', overallRating: 9, affordabilityRating: 8, comments: 'good' },
+      { id: '2', restaurantName: 'Mineo', location: 'Squirrel Hill', sauce: 's', toppings: 't', crust: 'c', overallRating: 9, affordabilityRating: 8, comments: 'good' }
+    ]);
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(fixture.componentInstance.filters().location).toBe('Brookline');
+    expect(text).toContain('Fiori');
+    expect(text).not.toContain('Mineo');
   });
 });

@@ -14,7 +14,7 @@
     <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
-  @if (!loading() && ratings().length > 0) {
+  @if (ratings().length > 0 || hasActiveFilters()) {
     <section class="filter-panel" aria-label="Rating filters">
       <div class="filter-heading">
         <h2>Filters</h2>
@@ -28,6 +28,8 @@
           Restaurant
           <input
             id="ratingFilterRestaurant"
+            name="filterRestaurant"
+            autocomplete="off"
             type="search"
             list="ratingRestaurantOptions"
             [value]="filters().restaurantName"
@@ -39,6 +41,8 @@
           Location
           <input
             id="ratingFilterLocation"
+            name="filterLocation"
+            autocomplete="off"
             type="search"
             list="ratingLocationOptions"
             [value]="filters().location"
@@ -50,6 +54,8 @@
           Sauce
           <input
             id="ratingFilterSauce"
+            name="filterSauce"
+            autocomplete="off"
             type="search"
             [value]="filters().sauce"
             (input)="setFilter('sauce', $event)"
@@ -60,6 +66,8 @@
           Toppings
           <input
             id="ratingFilterToppings"
+            name="filterToppings"
+            autocomplete="off"
             type="search"
             [value]="filters().toppings"
             (input)="setFilter('toppings', $event)"
@@ -70,6 +78,8 @@
           Crust
           <input
             id="ratingFilterCrust"
+            name="filterCrust"
+            autocomplete="off"
             type="search"
             [value]="filters().crust"
             (input)="setFilter('crust', $event)"
@@ -80,6 +90,8 @@
           Overall
           <input
             id="ratingFilterOverall"
+            name="filterOverall"
+            autocomplete="off"
             type="search"
             inputmode="decimal"
             [value]="filters().overallRating"
@@ -91,6 +103,8 @@
           Affordability
           <input
             id="ratingFilterAffordability"
+            name="filterAffordability"
+            autocomplete="off"
             type="search"
             inputmode="decimal"
             [value]="filters().affordabilityRating"
@@ -102,6 +116,8 @@
           Contributor
           <input
             id="ratingFilterContributor"
+            name="filterContributor"
+            autocomplete="off"
             type="search"
             list="ratingContributorOptions"
             [value]="filters().creator"
@@ -113,6 +129,8 @@
           Comments
           <input
             id="ratingFilterComments"
+            name="filterComments"
+            autocomplete="off"
             type="search"
             [value]="filters().comments"
             (input)="setFilter('comments', $event)"

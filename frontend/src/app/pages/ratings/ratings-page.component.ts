@@ -1,5 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { apiErrorMessage } from '../../core/http/api-error-message';
@@ -43,13 +43,15 @@ const emptyFilters: RatingFilters = {
 export class RatingsPage implements OnInit {
   private readonly ratingsService = inject(RatingsService);
   private readonly auth = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly ratings = signal<Rating[]>([]);
   readonly loading = signal(true);
   readonly loadFailed = signal(false);
   readonly errorMessage = signal('');
   readonly processingIds = signal<Set<string>>(new Set());
-  readonly filters = signal<RatingFilters>({ ...emptyFilters });
+  readonly filters = signal<RatingFilters>(this.filtersFromUrl());
 
   readonly hasActiveFilters = computed(() =>
     Object.values(this.filters()).some((value) => value.trim().length > 0)
@@ -101,10 +103,12 @@ export class RatingsPage implements OnInit {
   setFilter(key: RatingFilterKey, event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.filters.update((filters) => ({ ...filters, [key]: value }));
+    this.syncUrl();
   }
 
   clearFilters(): void {
     this.filters.set({ ...emptyFilters });
+    this.syncUrl();
   }
 
   isProcessing(id?: string): boolean {
@@ -147,6 +151,24 @@ export class RatingsPage implements OnInit {
     }
 
     this.processingIds.set(nextIds);
+  }
+
+  private filtersFromUrl(): RatingFilters {
+    const params = this.route.snapshot.queryParamMap;
+    const filters = { ...emptyFilters };
+
+    for (const key of Object.keys(emptyFilters) as RatingFilterKey[]) {
+      filters[key] = params.get(key) ?? '';
+    }
+
+    return filters;
+  }
+
+  private syncUrl(): void {
+    const queryParams = Object.fromEntries(
+      Object.entries(this.filters()).map(([key, value]) => [key, value.trim() || null])
+    );
+    void this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl: true });
   }
 
   private filterValue(rating: Rating, key: RatingFilterKey): string {
