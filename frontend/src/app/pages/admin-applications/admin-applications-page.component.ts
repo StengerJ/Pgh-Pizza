@@ -39,6 +39,9 @@ export class AdminApplicationsPage implements OnInit {
   readonly loadingApplications = signal(true);
   readonly loadingContributors = signal(true);
   readonly loadingUsers = signal(true);
+  readonly applicationsFailed = signal(false);
+  readonly contributorsFailed = signal(false);
+  readonly usersFailed = signal(false);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
   readonly pendingApplications = computed(() =>
@@ -195,6 +198,7 @@ export class AdminApplicationsPage implements OnInit {
 
   private loadApplications(): void {
     this.loadingApplications.set(true);
+    this.applicationsFailed.set(false);
     this.applicationsService
       .listApplications()
       .pipe(finalize(() => this.loadingApplications.set(false)))
@@ -202,6 +206,7 @@ export class AdminApplicationsPage implements OnInit {
         next: (applications) => this.applications.set(applications),
         error: () => {
           this.applications.set([]);
+          this.applicationsFailed.set(true);
           this.errorMessage.set('Applications could not be loaded.');
         }
       });
@@ -209,6 +214,7 @@ export class AdminApplicationsPage implements OnInit {
 
   private loadContributors(): void {
     this.loadingContributors.set(true);
+    this.contributorsFailed.set(false);
     this.adminService
       .listContributors()
       .pipe(finalize(() => this.loadingContributors.set(false)))
@@ -216,6 +222,7 @@ export class AdminApplicationsPage implements OnInit {
         next: (contributors) => this.contributors.set(contributors),
         error: () => {
           this.contributors.set([]);
+          this.contributorsFailed.set(true);
           this.errorMessage.set('Contributors could not be loaded.');
         }
       });
@@ -223,6 +230,7 @@ export class AdminApplicationsPage implements OnInit {
 
   private loadUsers(): void {
     this.loadingUsers.set(true);
+    this.usersFailed.set(false);
     this.adminService
       .listUsers()
       .pipe(finalize(() => this.loadingUsers.set(false)))
@@ -230,6 +238,7 @@ export class AdminApplicationsPage implements OnInit {
         next: (users) => this.users.set(users),
         error: () => {
           this.users.set([]);
+          this.usersFailed.set(true);
           this.errorMessage.set('Users could not be loaded.');
         }
       });

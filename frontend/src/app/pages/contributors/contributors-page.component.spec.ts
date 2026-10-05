@@ -56,4 +56,16 @@ describe('ContributorsPage', () => {
     expect(profileLink).not.toBeNull();
     expect(nativeElement.querySelector('.profile-thumb')).not.toBeNull();
   });
+
+  it('should show only the error, not the empty state, when contributors fail to load', () => {
+    fixture.detectChanges();
+    httpTesting
+      .expectOne('/api/profiles/contributors')
+      .flush(null, { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Contributors could not be loaded. Refresh the page to try again.');
+    expect(text).not.toContain('No contributors are available yet.');
+  });
 });

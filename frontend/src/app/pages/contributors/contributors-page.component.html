@@ -11,7 +11,7 @@
   }
 
   <div class="contributors-grid" aria-label="Contributors">
-    @if (!loading() && contributors().length === 0) {
+    @if (!loading() && !loadFailed() && contributors().length === 0) {
       <p class="status empty">No contributors are available yet.</p>
     } @else {
       @for (contributor of contributors(); track contributor.id) {

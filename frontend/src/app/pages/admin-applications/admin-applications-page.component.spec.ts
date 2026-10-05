@@ -35,6 +35,22 @@ describe('AdminApplicationsPage', () => {
     );
   });
 
+  it('should not claim the lists are empty when they failed to load', () => {
+    const fixture = TestBed.createComponent(AdminApplicationsPage);
+    fixture.detectChanges();
+    const httpTesting = TestBed.inject(HttpTestingController);
+    const fail = { status: 500, statusText: 'Server Error' };
+    httpTesting.expectOne('/api/admin/applications').flush(null, fail);
+    httpTesting.expectOne('/api/admin/contributors').flush(null, fail);
+    httpTesting.expectOne('/api/admin/users').flush(null, fail);
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).not.toContain('No applications are waiting for review.');
+    expect(text).not.toContain('No active users are available.');
+    expect(text).not.toContain('No active contributors are available.');
+  });
+
   it('should reject the application once the admin confirms', () => {
     spyOn(window, 'confirm').and.returnValue(true);
     const fixture = TestBed.createComponent(AdminApplicationsPage);

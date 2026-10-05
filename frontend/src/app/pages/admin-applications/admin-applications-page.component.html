@@ -31,7 +31,7 @@
         </tr>
       </thead>
       <tbody>
-        @if (!loadingApplications() && pendingApplications().length === 0) {
+        @if (!loadingApplications() && !applicationsFailed() && pendingApplications().length === 0) {
           <tr>
             <td colspan="5" class="empty">No applications are waiting for review.</td>
           </tr>
@@ -85,7 +85,7 @@
         </tr>
       </thead>
       <tbody>
-        @if (!loadingUsers() && users().length === 0) {
+        @if (!loadingUsers() && !usersFailed() && users().length === 0) {
           <tr>
             <td colspan="5" class="empty">No active users are available.</td>
           </tr>
@@ -159,7 +159,7 @@
         </tr>
       </thead>
       <tbody>
-        @if (!loadingContributors() && contributors().length === 0) {
+        @if (!loadingContributors() && !contributorsFailed() && contributors().length === 0) {
           <tr>
             <td colspan="5" class="empty">No active contributors are available.</td>
           </tr>
