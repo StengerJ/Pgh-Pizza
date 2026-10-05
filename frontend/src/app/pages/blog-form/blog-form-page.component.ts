@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
+import { focusFirstInvalid } from '../../core/forms/focus-first-invalid';
 import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AuthService } from '../../core/services/auth.service';
 import { BlogService } from '../../core/services/blog.service';
@@ -20,14 +21,16 @@ export class BlogFormPage implements OnInit {
   private readonly blogService = inject(BlogService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly host = inject(ElementRef<HTMLElement>).nativeElement;
+  private static readonly slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
   private editingPostId: string | null = null;
 
   readonly form = this.fb.group({
-    title: ['', [Validators.required, Validators.minLength(4)]],
+    title: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(180)]],
     location: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(180)]],
-    slug: [''],
-    body: ['', [Validators.required, Validators.minLength(20)]],
-    youtubeUrl: ['']
+    slug: ['', [Validators.maxLength(180), Validators.pattern(BlogFormPage.slugPattern)]],
+    body: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(20000)]],
+    youtubeUrl: ['', [Validators.maxLength(500)]]
   });
 
   readonly submitting = signal(false);
@@ -75,6 +78,7 @@ export class BlogFormPage implements OnInit {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      focusFirstInvalid(this.host);
       return;
     }
 
@@ -88,6 +92,13 @@ export class BlogFormPage implements OnInit {
     }
 
     const slug = value.slug.trim() || this.slugify(value.title);
+
+    if (!slug) {
+      this.form.controls.slug.setErrors({ pattern: true });
+      this.form.controls.slug.markAsTouched();
+      focusFirstInvalid(this.host);
+      return;
+    }
 
     this.submitting.set(true);
     const request = {

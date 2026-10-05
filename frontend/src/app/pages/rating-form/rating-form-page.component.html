@@ -1,35 +1,51 @@
 <section class="page narrow-page">
   <header class="page-header">
     <div>
-      <h1>{{ editing() ? 'Edit rating' : 'Add rating' }}</h1>
+      <h1>{{ editing() ? 'Edit Rating' : 'Add Rating' }}</h1>
       <p>Approved contributors can share and maintain pizza ratings with the PGH Pizza community.</p>
     </div>
-    <a class="button secondary" routerLink="/ratings">Back to ratings</a>
+    <a class="button secondary" routerLink="/ratings">Back to Ratings</a>
   </header>
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   @if (loading()) {
-    <p class="status">Loading rating...</p>
+    <p class="status" role="status">Loading rating…</p>
   }
 
   <form class="form-panel" [formGroup]="form" (ngSubmit)="submit()">
     <div class="split-grid">
       <div class="field">
-        <label for="restaurantName">Restaurant name</label>
-        <input id="restaurantName" type="text" formControlName="restaurantName">
+        <label for="restaurantName">Restaurant Name</label>
+        <input
+          id="restaurantName"
+          name="restaurantName"
+          type="text"
+          autocomplete="off"
+          aria-describedby="restaurantNameError"
+          [attr.aria-invalid]="form.controls.restaurantName.touched && form.controls.restaurantName.invalid"
+          formControlName="restaurantName"
+        >
         @if (form.controls.restaurantName.touched && form.controls.restaurantName.invalid) {
-          <small>Restaurant name is required.</small>
+          <small id="restaurantNameError">Use 2 to 160 characters.</small>
         }
       </div>
 
       <div class="field">
         <label for="location">Location</label>
-        <input id="location" type="text" formControlName="location">
+        <input
+          id="location"
+          name="location"
+          type="text"
+          autocomplete="off"
+          aria-describedby="locationError"
+          [attr.aria-invalid]="form.controls.location.touched && form.controls.location.invalid"
+          formControlName="location"
+        >
         @if (form.controls.location.touched && form.controls.location.invalid) {
-          <small>Location is required.</small>
+          <small id="locationError">Use 2 to 180 characters.</small>
         }
       </div>
     </div>
@@ -37,64 +53,115 @@
     <div class="split-grid">
       <div class="field">
         <label for="sauce">Sauce</label>
-        <input id="sauce" type="text" formControlName="sauce">
+        <input
+          id="sauce"
+          name="sauce"
+          type="text"
+          autocomplete="off"
+          placeholder="Sweet, chunky…"
+          aria-describedby="sauceError"
+          [attr.aria-invalid]="form.controls.sauce.touched && form.controls.sauce.invalid"
+          formControlName="sauce"
+        >
         @if (form.controls.sauce.touched && form.controls.sauce.invalid) {
-          <small>Sauce rating is required.</small>
+          <small id="sauceError">Describe the sauce (120 characters max).</small>
         }
       </div>
 
       <div class="field">
         <label for="toppings">Toppings</label>
-        <input id="toppings" type="text" formControlName="toppings">
+        <input
+          id="toppings"
+          name="toppings"
+          type="text"
+          autocomplete="off"
+          placeholder="Pepperoni cups…"
+          aria-describedby="toppingsError"
+          [attr.aria-invalid]="form.controls.toppings.touched && form.controls.toppings.invalid"
+          formControlName="toppings"
+        >
         @if (form.controls.toppings.touched && form.controls.toppings.invalid) {
-          <small>Toppings rating is required.</small>
+          <small id="toppingsError">Describe the toppings (160 characters max).</small>
         }
       </div>
     </div>
 
     <div class="field">
       <label for="crust">Crust</label>
-      <input id="crust" type="text" formControlName="crust">
+      <input
+        id="crust"
+        name="crust"
+        type="text"
+        autocomplete="off"
+        placeholder="Thin and crisp…"
+        aria-describedby="crustError"
+        [attr.aria-invalid]="form.controls.crust.touched && form.controls.crust.invalid"
+        formControlName="crust"
+      >
       @if (form.controls.crust.touched && form.controls.crust.invalid) {
-        <small>Crust rating is required.</small>
+        <small id="crustError">Describe the crust (120 characters max).</small>
       }
     </div>
 
     <div class="split-grid">
       <div class="field">
-        <label for="overallRating">Overall rating</label>
-        <input id="overallRating" type="number" min="1" max="10" step="0.01" formControlName="overallRating">
+        <label for="overallRating">Overall Rating</label>
+        <input
+          id="overallRating"
+          name="overallRating"
+          type="number"
+          inputmode="decimal"
+          min="1"
+          max="10"
+          step="0.01"
+          autocomplete="off"
+          aria-describedby="overallRatingError"
+          [attr.aria-invalid]="form.controls.overallRating.touched && form.controls.overallRating.invalid"
+          formControlName="overallRating"
+        >
         @if (form.controls.overallRating.touched && form.controls.overallRating.invalid) {
-          <small>Use a number from 1 to 10, decimals allowed.</small>
+          <small id="overallRatingError">Use a number from 1 to 10, decimals allowed.</small>
         }
       </div>
 
       <div class="field">
-        <label for="affordabilityRating">Affordability rating</label>
+        <label for="affordabilityRating">Affordability Rating</label>
         <input
           id="affordabilityRating"
+          name="affordabilityRating"
           type="number"
+          inputmode="decimal"
           min="1"
           max="10"
           step="0.01"
+          autocomplete="off"
+          aria-describedby="affordabilityRatingError"
+          [attr.aria-invalid]="form.controls.affordabilityRating.touched && form.controls.affordabilityRating.invalid"
           formControlName="affordabilityRating"
         >
         @if (form.controls.affordabilityRating.touched && form.controls.affordabilityRating.invalid) {
-          <small>Use a number from 1 to 10, decimals allowed.</small>
+          <small id="affordabilityRatingError">Use a number from 1 to 10, decimals allowed.</small>
         }
       </div>
     </div>
 
     <div class="field">
       <label for="comments">Comments</label>
-      <textarea id="comments" formControlName="comments"></textarea>
+      <textarea
+        id="comments"
+        name="comments"
+        autocomplete="off"
+        aria-describedby="commentsError"
+        [attr.aria-invalid]="form.controls.comments.touched && form.controls.comments.invalid"
+        formControlName="comments"
+      ></textarea>
       @if (form.controls.comments.touched && form.controls.comments.invalid) {
-        <small>Comments are required.</small>
+        <small id="commentsError">Write at least 5 characters (5,000 max).</small>
       }
     </div>
 
     <button class="button primary" type="submit" [disabled]="submitting()">
-      {{ submitting() ? 'Saving...' : editing() ? 'Save rating' : 'Publish rating' }}
+      {{ submitting() ? 'Saving…' : editing() ? 'Save Rating' : 'Publish Rating' }}
     </button>
   </form>
 </section>

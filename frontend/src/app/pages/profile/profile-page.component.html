@@ -1,6 +1,6 @@
 <section class="page table-page profile-page">
   @if (loading()) {
-    <p class="status">Loading profile...</p>
+    <p class="status" role="status">Loading profile…</p>
   }
 
   @if (errorMessage()) {
@@ -43,7 +43,7 @@
         <div class="split-grid">
           <div class="field">
             <label for="displayName">Profile name</label>
-            <input id="displayName" type="text" formControlName="displayName">
+            <input id="displayName" name="displayName" type="text" autocomplete="nickname" formControlName="displayName">
             @if (form.controls.displayName.touched && form.controls.displayName.invalid) {
               <small>Use 2 to 120 characters.</small>
             }
@@ -87,7 +87,7 @@
 
         <div class="field">
           <label for="bio">Bio</label>
-          <textarea id="bio" maxlength="500" formControlName="bio"></textarea>
+          <textarea id="bio" name="bio" maxlength="500" formControlName="bio"></textarea>
           @if (form.controls.bio.touched && form.controls.bio.invalid) {
             <small>Bio must be 500 characters or fewer.</small>
           }
@@ -95,7 +95,7 @@
 
         <div class="actions">
           <button class="button primary" type="submit" [disabled]="saving()">
-            {{ saving() ? 'Saving...' : 'Save profile' }}
+            {{ saving() ? 'Saving…' : 'Save Profile' }}
           </button>
           <button class="button secondary" type="button" [disabled]="saving()" (click)="cancelEditing()">
             Cancel

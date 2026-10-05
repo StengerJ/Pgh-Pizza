@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
+import { focusFirstInvalid } from '../../core/forms/focus-first-invalid';
 import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AuthService } from '../../core/services/auth.service';
 import { RatingsService } from '../../core/services/ratings.service';
@@ -19,17 +20,18 @@ export class RatingFormPage implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly ratingsService = inject(RatingsService);
   private readonly router = inject(Router);
+  private readonly host = inject(ElementRef<HTMLElement>).nativeElement;
   private editingRatingId: string | null = null;
 
   readonly form = this.fb.group({
-    restaurantName: ['', [Validators.required, Validators.minLength(2)]],
+    restaurantName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(160)]],
     location: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(180)]],
-    sauce: ['', [Validators.required]],
-    toppings: ['', [Validators.required]],
-    crust: ['', [Validators.required]],
+    sauce: ['', [Validators.required, Validators.maxLength(120)]],
+    toppings: ['', [Validators.required, Validators.maxLength(160)]],
+    crust: ['', [Validators.required, Validators.maxLength(120)]],
     overallRating: [8, [Validators.required, Validators.min(1), Validators.max(10)]],
     affordabilityRating: [8, [Validators.required, Validators.min(1), Validators.max(10)]],
-    comments: ['', [Validators.required, Validators.minLength(5)]]
+    comments: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5000)]]
   });
 
   readonly submitting = signal(false);
@@ -80,6 +82,7 @@ export class RatingFormPage implements OnInit {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      focusFirstInvalid(this.host);
       return;
     }
 

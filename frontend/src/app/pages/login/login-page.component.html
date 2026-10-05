@@ -17,7 +17,7 @@
   <form class="form-panel" [formGroup]="form" (ngSubmit)="submit()">
     <div class="field">
       <label for="email">Email</label>
-      <input id="email" type="email" autocomplete="email" formControlName="email">
+      <input id="email" name="email" type="email" autocomplete="email" spellcheck="false" formControlName="email">
       @if (form.controls.email.touched && form.controls.email.invalid) {
         <small>Enter a valid email address.</small>
       }
@@ -25,7 +25,7 @@
 
     <div class="field">
       <label for="password">Password</label>
-      <input id="password" type="password" autocomplete="current-password" formControlName="password">
+      <input id="password" name="password" type="password" autocomplete="current-password" formControlName="password">
       @if (form.controls.password.touched && form.controls.password.invalid) {
         <small>Password is required.</small>
       }
@@ -33,9 +33,9 @@
 
     <div class="actions">
       <button class="button primary" type="submit" [disabled]="submitting()">
-        {{ submitting() ? 'Logging in...' : 'Login' }}
+        {{ submitting() ? 'Logging In…' : 'Log In' }}
       </button>
-      <a class="button secondary" routerLink="/password-reset">Reset password</a>
+      <a class="button secondary" routerLink="/password-reset">Reset Password</a>
     </div>
   </form>
 </section>

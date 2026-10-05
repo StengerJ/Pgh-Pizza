@@ -21,7 +21,7 @@
     <div class="split-grid">
       <div class="field">
         <label for="email">Email</label>
-        <input id="email" type="email" autocomplete="email" formControlName="email">
+        <input id="email" name="email" type="email" autocomplete="email" spellcheck="false" formControlName="email">
         @if (form.controls.email.touched && form.controls.email.invalid) {
           <small>Enter a valid email address.</small>
         }
@@ -29,7 +29,7 @@
 
       <div class="field">
         <label for="displayName">Display name</label>
-        <input id="displayName" type="text" autocomplete="name" formControlName="displayName">
+        <input id="displayName" name="displayName" type="text" autocomplete="name" formControlName="displayName">
         @if (form.controls.displayName.touched && form.controls.displayName.invalid) {
           <small>Display name must be at least 2 characters.</small>
         }
@@ -39,9 +39,9 @@
     <div class="split-grid">
       <div class="field">
         <label for="password">Password</label>
-        <input id="password" type="password" autocomplete="new-password" formControlName="password">
+        <input id="password" name="password" type="password" autocomplete="new-password" formControlName="password">
         @if (form.controls.password.touched && form.controls.password.invalid) {
-          <small>Password must be at least 8 characters.</small>
+          <small>Use 8 to 128 characters.</small>
         }
       </div>
 
@@ -49,6 +49,7 @@
         <label for="confirmPassword">Confirm password</label>
         <input
           id="confirmPassword"
+          name="confirmPassword"
           type="password"
           autocomplete="new-password"
           formControlName="confirmPassword"
@@ -61,14 +62,14 @@
 
     <div class="field">
       <label for="applicationReason">Why do you want to contribute?</label>
-      <textarea id="applicationReason" formControlName="applicationReason"></textarea>
+      <textarea id="applicationReason" name="applicationReason" formControlName="applicationReason"></textarea>
       @if (form.controls.applicationReason.touched && form.controls.applicationReason.invalid) {
         <small>Please share at least 5 characters.</small>
       }
     </div>
 
     <button class="button primary" type="submit" [disabled]="submitting()">
-      {{ submitting() ? 'Submitting...' : 'Submit application' }}
+      {{ submitting() ? 'Submitting…' : 'Submit Application' }}
     </button>
   </form>
 </section>

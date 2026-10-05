@@ -1,6 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
+import { focusFirstInvalid } from '../../core/forms/focus-first-invalid';
 import { apiErrorMessage } from '../../core/http/api-error-message';
 import { ApplicationsService } from '../../core/services/applications.service';
 
@@ -14,13 +15,14 @@ import { ApplicationsService } from '../../core/services/applications.service';
 export class ApplyPage {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly applicationsService = inject(ApplicationsService);
+  private readonly host = inject(ElementRef<HTMLElement>).nativeElement;
 
   readonly form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    displayName: ['', [Validators.required, Validators.minLength(2)]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    email: ['', [Validators.required, Validators.email, Validators.maxLength(320)]],
+    displayName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(120)]],
+    password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(128)]],
     confirmPassword: ['', [Validators.required]],
-    applicationReason: ['', [Validators.required, Validators.minLength(5)]]
+    applicationReason: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5000)]]
   });
 
   readonly submitted = signal(false);
@@ -40,6 +42,7 @@ export class ApplyPage {
 
     if (this.form.invalid || !this.passwordsMatch()) {
       this.form.markAllAsTouched();
+      focusFirstInvalid(this.host);
       return;
     }
 

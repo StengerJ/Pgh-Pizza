@@ -259,6 +259,14 @@ tbody tr:last-child td {
   color: var(--accent-maroon);
 }
 
+.field small.hint {
+  color: var(--muted);
+}
+
+.field [aria-invalid='true'] {
+  border-color: var(--accent-bright-red);
+}
+
 .split-grid {
   display: grid;
   gap: 16px;
