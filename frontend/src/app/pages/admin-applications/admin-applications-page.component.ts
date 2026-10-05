@@ -55,6 +55,10 @@ export class AdminApplicationsPage implements OnInit {
   }
 
   reject(application: ContributorApplication): void {
+    if (!confirm(`Reject the application from ${application.displayName}? This cannot be undone.`)) {
+      return;
+    }
+
     this.updateApplication(application.id, 'REJECTED');
   }
 

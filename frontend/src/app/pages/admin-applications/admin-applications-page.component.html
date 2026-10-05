@@ -16,6 +16,7 @@
 
   <div class="section-heading">
     <h2>Contributor applications</h2>
+    <span class="subtle">{{ pendingApplications().length }} pending</span>
   </div>
 
   <div class="table-wrap">
@@ -25,7 +26,6 @@
           <th>Applicant</th>
           <th>Email</th>
           <th>Reason</th>
-          <th>Status</th>
           <th>Submitted</th>
           <th>Actions</th>
         </tr>
@@ -33,7 +33,7 @@
       <tbody>
         @if (!loadingApplications() && pendingApplications().length === 0) {
           <tr>
-            <td colspan="6" class="empty">No applications are waiting for review.</td>
+            <td colspan="5" class="empty">No applications are waiting for review.</td>
           </tr>
         } @else {
           @for (application of pendingApplications(); track application.id) {
@@ -41,7 +41,6 @@
               <td data-label="Applicant">{{ application.displayName }}</td>
               <td data-label="Email">{{ application.email }}</td>
               <td data-label="Reason">{{ application.applicationReason }}</td>
-              <td data-label="Status">{{ application.status }}</td>
               <td data-label="Submitted">{{ application.createdAt | date: 'mediumDate' }}</td>
               <td data-label="Actions">
                 <div class="row-actions">
