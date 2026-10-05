@@ -10,11 +10,11 @@
   </header>
 
   @if (successMessage()) {
-    <p class="status success">{{ successMessage() }}</p>
+    <p class="status success" role="status">{{ successMessage() }}</p>
   }
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   <form class="form-panel" [formGroup]="form" (ngSubmit)="submit()">

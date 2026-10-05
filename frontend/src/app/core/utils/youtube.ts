@@ -56,7 +56,7 @@ export function extractYoutubeVideoId(value: string | null | undefined): string 
 }
 
 export function buildYoutubeEmbedUrl(videoId: string): string {
-  return `https://www.youtube.com/embed/${videoId}`;
+  return `https://www.youtube-nocookie.com/embed/${videoId}`;
 }
 
 function isYoutubeHost(host: string): boolean {

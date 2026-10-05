@@ -4,11 +4,11 @@
   }
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   @if (successMessage()) {
-    <p class="status success">{{ successMessage() }}</p>
+    <p class="status success" role="status">{{ successMessage() }}</p>
   }
 
   @if (profile(); as currentProfile) {
@@ -16,6 +16,8 @@
       @if (currentProfile.profilePictureUrl) {
         <img
           class="profile-photo"
+          width="112"
+          height="112"
           [src]="currentProfile.profilePictureUrl"
           [alt]="currentProfile.displayName + ' profile picture'"
         >
@@ -55,6 +57,8 @@
               @if (picturePreview(); as previewUrl) {
                 <img
                   class="picture-preview"
+                  width="88"
+                  height="88"
                   [src]="previewUrl"
                   alt="Selected profile picture preview"
                 >

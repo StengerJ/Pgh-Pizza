@@ -143,5 +143,7 @@ describe('RatingsPage', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('Ratings could not be loaded. Refresh the page to try again.');
     expect(text).not.toContain('No ratings are available yet.');
+    expect((fixture.nativeElement as HTMLElement).querySelector('.status.error[role="alert"]'))
+      .not.toBeNull();
   });
 });

@@ -15,11 +15,11 @@
   }
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   @if (!loading() && !loadFailed() && posts().length === 0) {
-    <p class="status">No blog posts are available yet.</p>
+    <p class="status" role="status">No blog posts are available yet.</p>
   }
 
   <div class="post-grid">

@@ -11,7 +11,7 @@
   </header>
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   @if (!loading() && ratings().length > 0) {

@@ -81,7 +81,7 @@ export class BlogListPage implements OnInit {
   }
 
   excerpt(post: BlogPost): string {
-    return post.body.length > 180 ? `${post.body.slice(0, 180)}...` : post.body;
+    return post.body.length > 180 ? `${post.body.slice(0, 180)}…` : post.body;
   }
 
   private setProcessing(id: string, processing: boolean): void {

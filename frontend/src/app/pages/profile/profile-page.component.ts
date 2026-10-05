@@ -119,7 +119,7 @@ export class ProfilePage implements OnInit {
   }
 
   excerpt(post: BlogPost): string {
-    return post.body.length > 140 ? `${post.body.slice(0, 140)}...` : post.body;
+    return post.body.length > 140 ? `${post.body.slice(0, 140)}…` : post.body;
   }
 
   selectProfilePicture(event: Event): void {
