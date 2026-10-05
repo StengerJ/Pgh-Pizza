@@ -147,6 +147,52 @@ describe('RatingsPage', () => {
       .not.toBeNull();
   });
 
+  const scored = (id: string, overallRating: number, affordabilityRating = 5) => ({
+    id,
+    restaurantName: `R${id}`,
+    location: 'L',
+    sauce: '5',
+    toppings: '5',
+    crust: '5',
+    overallRating,
+    affordabilityRating,
+    comments: 'c'
+  });
+
+  it('should treat the overall filter as a minimum score', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/ratings').flush([scored('a', 6.9), scored('b', 9.2), scored('c', 10)]);
+    fixture.detectChanges();
+
+    const select = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLSelectElement>('#ratingFilterOverall')!;
+    select.value = '9';
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Rb');
+    expect(text).toContain('Rc');
+    expect(text).not.toContain('Ra');
+  });
+
+  it('should sort by highest overall score when chosen', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/ratings').flush([scored('a', 6.9), scored('b', 9.2), scored('c', 10)]);
+    fixture.detectChanges();
+
+    const sort = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLSelectElement>('#ratingSort')!;
+    sort.value = 'overall';
+    sort.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const names = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('app-rating-card h3')
+    ).map((heading) => heading.textContent?.trim());
+    expect(names).toEqual(['Rc', 'Rb', 'Ra']);
+  });
+
   it('should write active filters to the URL query string', () => {
     const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
     fixture.detectChanges();

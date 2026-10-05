@@ -39,7 +39,9 @@
   gap: 6px;
 }
 
-.filter-grid input {
+.filter-grid input,
+.filter-grid select,
+.sort-control select {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -81,4 +83,14 @@
   .ratings-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.sort-control {
+  align-items: center;
+  color: var(--ink);
+  display: flex;
+  font-size: 0.85rem;
+  font-weight: 800;
+  gap: 8px;
+  margin-left: auto;
 }

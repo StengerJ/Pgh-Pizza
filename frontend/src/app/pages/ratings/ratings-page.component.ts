@@ -4,6 +4,7 @@ import { finalize } from 'rxjs';
 
 import { apiErrorMessage } from '../../core/http/api-error-message';
 import { Rating } from '../../core/models/rating.model';
+import { toScore } from '../../core/scores/score';
 import { AuthService } from '../../core/services/auth.service';
 import { RatingsService } from '../../core/services/ratings.service';
 import { RatingCard } from '../../shared/rating-card/rating-card';
@@ -20,6 +21,18 @@ type RatingFilterKey =
   | 'comments';
 
 type RatingFilters = Record<RatingFilterKey, string>;
+
+type RatingSort = 'newest' | 'overall' | 'value';
+
+const sorts: readonly RatingSort[] = ['newest', 'overall', 'value'];
+
+const scoreFilterKeys: readonly RatingFilterKey[] = [
+  'overallRating',
+  'affordabilityRating',
+  'sauce',
+  'crust',
+  'toppings'
+];
 
 const emptyFilters: RatingFilters = {
   restaurantName: '',
@@ -52,9 +65,21 @@ export class RatingsPage implements OnInit {
   readonly errorMessage = signal('');
   readonly processingIds = signal<Set<string>>(new Set());
   readonly filters = signal<RatingFilters>(this.filtersFromUrl());
+  readonly sort = signal<RatingSort>(this.sortFromUrl());
+  readonly minimumScores = [9, 8, 7, 6, 5];
 
-  readonly hasActiveFilters = computed(() =>
-    Object.values(this.filters()).some((value) => value.trim().length > 0)
+  readonly scoreFilters: { key: RatingFilterKey; id: string; label: string }[] = [
+    { key: 'overallRating', id: 'ratingFilterOverall', label: 'Min Overall' },
+    { key: 'affordabilityRating', id: 'ratingFilterAffordability', label: 'Min Value' },
+    { key: 'sauce', id: 'ratingFilterSauce', label: 'Min Sauce' },
+    { key: 'crust', id: 'ratingFilterCrust', label: 'Min Crust' },
+    { key: 'toppings', id: 'ratingFilterToppings', label: 'Min Toppings' }
+  ];
+
+  readonly hasActiveFilters = computed(
+    () =>
+      this.sort() !== 'newest' ||
+      Object.values(this.filters()).some((value) => value.trim().length > 0)
   );
 
   readonly restaurantFilterOptions = computed(() => this.uniqueFilterOptions('restaurantName'));
@@ -71,8 +96,21 @@ export class RatingsPage implements OnInit {
     }
 
     return this.ratings().filter((rating) =>
-      activeFilters.every(([key, value]) => this.filterValue(rating, key).includes(value))
+      activeFilters.every(([key, value]) => this.matches(rating, key, value))
     );
+  });
+
+  readonly visibleRatings = computed(() => {
+    const ratings = [...this.filteredRatings()];
+    const sort = this.sort();
+
+    if (sort === 'overall') {
+      ratings.sort((a, b) => b.overallRating - a.overallRating);
+    } else if (sort === 'value') {
+      ratings.sort((a, b) => b.affordabilityRating - a.affordabilityRating);
+    }
+
+    return ratings;
   });
 
   ngOnInit(): void {
@@ -101,13 +139,20 @@ export class RatingsPage implements OnInit {
   }
 
   setFilter(key: RatingFilterKey, event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
+    const value = (event.target as HTMLInputElement | HTMLSelectElement).value;
     this.filters.update((filters) => ({ ...filters, [key]: value }));
+    this.syncUrl();
+  }
+
+  setSort(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value as RatingSort;
+    this.sort.set(sorts.includes(value) ? value : 'newest');
     this.syncUrl();
   }
 
   clearFilters(): void {
     this.filters.set({ ...emptyFilters });
+    this.sort.set('newest');
     this.syncUrl();
   }
 
@@ -165,10 +210,28 @@ export class RatingsPage implements OnInit {
   }
 
   private syncUrl(): void {
-    const queryParams = Object.fromEntries(
-      Object.entries(this.filters()).map(([key, value]) => [key, value.trim() || null])
-    );
+    const queryParams = {
+      ...Object.fromEntries(
+        Object.entries(this.filters()).map(([key, value]) => [key, value.trim() || null])
+      ),
+      sort: this.sort() === 'newest' ? null : this.sort()
+    };
     void this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl: true });
+  }
+
+  private sortFromUrl(): RatingSort {
+    const value = this.route.snapshot.queryParamMap.get('sort') as RatingSort | null;
+    return value && sorts.includes(value) ? value : 'newest';
+  }
+
+  private matches(rating: Rating, key: RatingFilterKey, value: string): boolean {
+    if (scoreFilterKeys.includes(key)) {
+      const minimum = toScore(value);
+      const score = toScore(rating[key as keyof Rating]);
+      return minimum === null || (score !== null && score >= minimum);
+    }
+
+    return this.filterValue(rating, key).includes(value);
   }
 
   private filterValue(rating: Rating, key: RatingFilterKey): string {
