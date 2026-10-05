@@ -185,6 +185,16 @@ tbody tr:last-child td {
   border-bottom: 0;
 }
 
+.link-inline {
+  background: none;
+  border: 0;
+  color: var(--accent-maroon);
+  cursor: pointer;
+  font-weight: 800;
+  padding: 0;
+  text-decoration: underline;
+}
+
 .empty,
 .status {
   color: var(--muted);

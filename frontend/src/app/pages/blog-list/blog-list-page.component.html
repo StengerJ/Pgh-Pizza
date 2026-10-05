@@ -11,14 +11,14 @@
   </header>
 
   @if (loading()) {
-    <p class="status">Loading posts...</p>
+    <p class="status" role="status">Loading posts…</p>
   }
 
   @if (errorMessage()) {
     <p class="status error">{{ errorMessage() }}</p>
   }
 
-  @if (!loading() && posts().length === 0) {
+  @if (!loading() && !loadFailed() && posts().length === 0) {
     <p class="status">No blog posts are available yet.</p>
   }
 

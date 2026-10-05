@@ -6,7 +6,7 @@
   }
 
   @if (errorMessage()) {
-    <p class="status">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   @if (post(); as currentPost) {

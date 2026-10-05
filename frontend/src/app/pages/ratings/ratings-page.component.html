@@ -140,14 +140,22 @@
     </section>
   }
 
-  <div class="ratings-grid" aria-label="Pizza ratings">
-    @if (!loading() && ratings().length === 0) {
+  @if (loading()) {
+    <p class="status" role="status">Loading ratings…</p>
+  }
+
+  <div class="ratings-grid" role="list" aria-label="Pizza ratings">
+    @if (!loading() && !loadFailed() && ratings().length === 0) {
       <p class="status empty">No ratings are available yet.</p>
-    } @else if (!loading() && filteredRatings().length === 0) {
-      <p class="status empty">No ratings match those filters.</p>
+    } @else if (!loading() && ratings().length > 0 && filteredRatings().length === 0) {
+      <p class="status empty">
+        No ratings match those filters.
+        <button class="link-inline" type="button" (click)="clearFilters()">Clear Filters</button>
+      </p>
     } @else {
       @for (rating of filteredRatings(); track rating.id ?? rating.restaurantName) {
         <app-rating-card
+          role="listitem"
           [rating]="rating"
           [canManage]="canManage(rating)"
           [processing]="isProcessing(rating.id)"

@@ -1,4 +1,5 @@
 import { DatePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -47,7 +48,14 @@ export class BlogDetailPage implements OnInit {
           this.post.set(post);
           this.embedUrl.set(this.createEmbedUrl(post));
         },
-        error: () => this.errorMessage.set('No blog post is available yet.')
+        error: (error: unknown) => {
+          const notFound = error instanceof HttpErrorResponse && error.status === 404;
+          this.errorMessage.set(
+            notFound
+              ? 'This post does not exist or was removed. Browse the blog for other posts.'
+              : apiErrorMessage(error, 'This post could not be loaded. Refresh the page to try again.')
+          );
+        }
       });
   }
 

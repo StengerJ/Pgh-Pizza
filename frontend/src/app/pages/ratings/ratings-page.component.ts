@@ -46,6 +46,7 @@ export class RatingsPage implements OnInit {
 
   readonly ratings = signal<Rating[]>([]);
   readonly loading = signal(true);
+  readonly loadFailed = signal(false);
   readonly errorMessage = signal('');
   readonly processingIds = signal<Set<string>>(new Set());
   readonly filters = signal<RatingFilters>({ ...emptyFilters });
@@ -78,7 +79,13 @@ export class RatingsPage implements OnInit {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (ratings) => this.ratings.set(ratings),
-        error: () => this.ratings.set([])
+        error: (error: unknown) => {
+          this.ratings.set([]);
+          this.loadFailed.set(true);
+          this.errorMessage.set(
+            apiErrorMessage(error, 'Ratings could not be loaded. Refresh the page to try again.')
+          );
+        }
       });
   }
 

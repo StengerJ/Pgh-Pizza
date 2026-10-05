@@ -71,20 +71,6 @@ describe('RatingsPage', () => {
     expect(nativeElement.textContent).toContain('Classic Pittsburgh slice');
   });
 
-  it('should show the empty state instead of an error box when ratings fail to load', () => {
-    fixture.detectChanges();
-    httpTesting.expectOne('/api/ratings').flush(null, {
-      status: 500,
-      statusText: 'Server Error'
-    });
-    fixture.detectChanges();
-
-    const nativeElement = fixture.nativeElement as HTMLElement;
-
-    expect(nativeElement.querySelector('.status.error')).toBeNull();
-    expect(nativeElement.textContent).toContain('No ratings are available yet.');
-  });
-
   it('should filter ratings and provide autofill options for key columns', () => {
     fixture.detectChanges();
     httpTesting.expectOne('/api/ratings').flush([
@@ -141,5 +127,21 @@ describe('RatingsPage', () => {
     expect(restaurantOptions).toContain('Fiori Pizza');
     expect(locationOptions).toContain('Brookline');
     expect(contributorOptions).toContain('Joshua Stenger');
+  });
+
+  it('should show a loading message until ratings arrive', () => {
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Loading ratings…');
+    httpTesting.expectOne('/api/ratings').flush([]);
+  });
+
+  it('should show an error instead of the empty state when loading fails', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/ratings').flush(null, { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Ratings could not be loaded. Refresh the page to try again.');
+    expect(text).not.toContain('No ratings are available yet.');
   });
 });

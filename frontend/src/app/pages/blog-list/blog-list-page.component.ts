@@ -21,6 +21,7 @@ export class BlogListPage implements OnInit {
 
   readonly posts = signal<BlogPost[]>([]);
   readonly loading = signal(true);
+  readonly loadFailed = signal(false);
   readonly errorMessage = signal('');
   readonly processingIds = signal<Set<string>>(new Set());
 
@@ -30,7 +31,13 @@ export class BlogListPage implements OnInit {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (posts) => this.posts.set(posts),
-        error: () => this.posts.set([])
+        error: (error: unknown) => {
+          this.posts.set([]);
+          this.loadFailed.set(true);
+          this.errorMessage.set(
+            apiErrorMessage(error, 'Blog posts could not be loaded. Refresh the page to try again.')
+          );
+        }
       });
   }
 
