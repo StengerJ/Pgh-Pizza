@@ -1,8 +1,9 @@
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { Component, inject, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
+import { catchError, map, of } from 'rxjs';
 
 import { AuthService } from '../services/auth.service';
 import { sessionExpiryInterceptor } from './session-expiry.interceptor';
@@ -63,5 +64,45 @@ describe('sessionExpiryInterceptor', () => {
     httpTesting.expectOne('/api/ratings').flush(null, { status: 401, statusText: 'Unauthorized' });
 
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+});
+
+describe('sessionExpiryInterceptor during a guarded navigation', () => {
+  @Component({ template: '' })
+  class Blank {}
+
+  const meGuard = () =>
+    inject(HttpClient).get('/api/auth/me').pipe(
+      map(() => true),
+      catchError(() => of(false))
+    );
+
+  it('should return the user to the page they were navigating to, not the page they left', async () => {
+    const auth = jasmine.createSpyObj<AuthService>('AuthService', ['token', 'logout']);
+    auth.token.and.returnValue('stale-token');
+    TestBed.configureTestingModule({
+      providers: [
+        provideZonelessChangeDetection(),
+        provideRouter([
+          { path: 'ratings', component: Blank },
+          { path: 'ratings/new', component: Blank, canActivate: [meGuard] },
+          { path: 'login', component: Blank }
+        ]),
+        provideHttpClient(withInterceptors([sessionExpiryInterceptor])),
+        provideHttpClientTesting(),
+        { provide: AuthService, useValue: auth }
+      ]
+    });
+    const router = TestBed.inject(Router);
+    const httpTesting = TestBed.inject(HttpTestingController);
+    await router.navigateByUrl('/ratings');
+
+    const navigation = router.navigateByUrl('/ratings/new');
+    await new Promise((resolve) => setTimeout(resolve));
+    httpTesting.expectOne('/api/auth/me').flush(null, { status: 401, statusText: 'Unauthorized' });
+    await navigation;
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(router.url).toBe('/login?returnUrl=%2Fratings%2Fnew&reason=expired');
   });
 });

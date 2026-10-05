@@ -18,7 +18,10 @@ export const sessionExpiryInterceptor: HttpInterceptorFn = (request, next) => {
         error.status === 401 &&
         !request.url.includes('/auth/login')
       ) {
-        const returnUrl = router.url;
+        // A guard's request fails mid-navigation; return to where the user was headed.
+        const navigation = router.currentNavigation();
+        const target = navigation?.finalUrl ?? navigation?.extractedUrl;
+        const returnUrl = target ? router.serializeUrl(target) : router.url;
         auth.logout();
         void router.navigate(['/login'], { queryParams: { returnUrl, reason: 'expired' } });
       }
