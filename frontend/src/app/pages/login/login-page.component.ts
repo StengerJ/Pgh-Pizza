@@ -36,8 +36,9 @@ export class LoginPage {
 
     this.submitting.set(true);
     this.auth.login(this.form.getRawValue()).subscribe({
-      next: () => {
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/ratings';
+      next: (session) => {
+        const fallback = session.user.status === 'PENDING' ? '/' : '/ratings';
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? fallback;
         this.submitting.set(false);
         void this.router.navigateByUrl(returnUrl);
       },
