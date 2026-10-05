@@ -77,9 +77,9 @@ class ApiFlowSecurityTests {
                 .content(json(Map.of(
                         "restaurantName", "Mineo's",
                         "location", "Squirrel Hill",
-                        "sauce", "Balanced",
-                        "toppings", "Pepperoni",
-                        "crust", "Crisp",
+                        "sauce", "7.5",
+                        "toppings", "8",
+                        "crust", "6.5",
                         "overallRating", 8,
                         "affordabilityRating", 7,
                         "comments", "Pending users should not be able to publish"))))
@@ -122,9 +122,9 @@ class ApiFlowSecurityTests {
                 .content(json(Map.of(
                         "restaurantName", "Directory Slice",
                         "location", "Strip District",
-                        "sauce", "Bright",
-                        "toppings", "Cheese",
-                        "crust", "Thin",
+                        "sauce", "7.5",
+                        "toppings", "8",
+                        "crust", "6.5",
                         "overallRating", 8.5,
                         "affordabilityRating", 8,
                         "comments", "Counts toward the public directory"))))
@@ -195,9 +195,9 @@ class ApiFlowSecurityTests {
                 .content(json(Map.of(
                         "restaurantName", "Driftwood Oven",
                         "location", "Lawrenceville",
-                        "sauce", "Bright",
-                        "toppings", "Mushroom",
-                        "crust", "Wood fired",
+                        "sauce", "7.5",
+                        "toppings", "8",
+                        "crust", "6.5",
                         "overallRating", 9,
                         "affordabilityRating", 8,
                         "comments", "Great slice"))))
@@ -221,9 +221,9 @@ class ApiFlowSecurityTests {
                 .content(json(Map.of(
                         "restaurantName", "Driftwood Oven",
                         "location", "Lawrenceville",
-                        "sauce", "Bright",
-                        "toppings", "Mushroom",
-                        "crust", "Wood fired",
+                        "sauce", "7.5",
+                        "toppings", "8",
+                        "crust", "6.5",
                         "overallRating", 9.5,
                         "affordabilityRating", 7.5,
                         "comments", "Great slice, edited"))))
@@ -256,9 +256,9 @@ class ApiFlowSecurityTests {
                 .content(json(Map.of(
                         "restaurantName", "Badamo's",
                         "location", "North Side",
-                        "sauce", "Tangy",
-                        "toppings", "Cheese",
-                        "crust", "Thin",
+                        "sauce", "7.5",
+                        "toppings", "8",
+                        "crust", "6.5",
                         "overallRating", 8.5,
                         "affordabilityRating", 9.25,
                         "comments", "Worth logging"))))
@@ -346,9 +346,9 @@ class ApiFlowSecurityTests {
                 .content(json(Map.of(
                         "restaurantName", "Slice Island",
                         "location", "Bloomfield",
-                        "sauce", "Garlic",
-                        "toppings", "Banana peppers",
-                        "crust", "Soft",
+                        "sauce", "7.5",
+                        "toppings", "8",
+                        "crust", "6.5",
                         "overallRating", 8.25,
                         "affordabilityRating", 9,
                         "comments", "A profile-worthy slice"))))
@@ -505,9 +505,9 @@ class ApiFlowSecurityTests {
                 .content(json(Map.of(
                         "restaurantName", maliciousText,
                         "location", maliciousText,
-                        "sauce", "Still sauce",
-                        "toppings", "Plain text",
-                        "crust", "Safe",
+                        "sauce", "7.5",
+                        "toppings", "8",
+                        "crust", "6.5",
                         "overallRating", 7,
                         "affordabilityRating", 6,
                         "comments", maliciousText))))
