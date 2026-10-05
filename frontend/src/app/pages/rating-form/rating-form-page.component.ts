@@ -1,8 +1,9 @@
-import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { focusFirstInvalid } from '../../core/forms/focus-first-invalid';
+import { HasUnsavedChanges } from '../../core/guards/unsaved-changes.guard';
 import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AuthService } from '../../core/services/auth.service';
 import { RatingsService } from '../../core/services/ratings.service';
@@ -14,7 +15,7 @@ import { RatingsService } from '../../core/services/ratings.service';
   templateUrl: './rating-form-page.component.html',
   styleUrls: ['./rating-form-page.component.css']
 })
-export class RatingFormPage implements OnInit {
+export class RatingFormPage implements OnInit, HasUnsavedChanges {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly auth = inject(AuthService);
@@ -22,6 +23,7 @@ export class RatingFormPage implements OnInit {
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>).nativeElement;
   private editingRatingId: string | null = null;
+  private saved = false;
 
   readonly form = this.fb.group({
     restaurantName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(160)]],
@@ -77,6 +79,17 @@ export class RatingFormPage implements OnInit {
     });
   }
 
+  hasUnsavedChanges(): boolean {
+    return this.form.dirty && !this.saved;
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  warnOnUnload(event: BeforeUnloadEvent): void {
+    if (this.hasUnsavedChanges()) {
+      event.preventDefault();
+    }
+  }
+
   submit(): void {
     this.errorMessage.set('');
 
@@ -106,6 +119,7 @@ export class RatingFormPage implements OnInit {
 
     saveRequest.subscribe({
       next: () => {
+        this.saved = true;
         this.submitting.set(false);
         void this.router.navigateByUrl('/ratings');
       },

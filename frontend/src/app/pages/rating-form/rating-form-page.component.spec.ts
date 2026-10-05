@@ -20,6 +20,13 @@ describe('RatingFormPage', () => {
     }).compileComponents();
   });
 
+  it('should report unsaved changes only while the form is dirty', () => {
+    const page = TestBed.createComponent(RatingFormPage).componentInstance;
+    expect(page.hasUnsavedChanges()).toBeFalse();
+    page.form.markAsDirty();
+    expect(page.hasUnsavedChanges()).toBeTrue();
+  });
+
   it('should enforce the backend length limits', () => {
     const { controls } = TestBed.createComponent(RatingFormPage).componentInstance.form;
     controls.restaurantName.setValue('x'.repeat(161));

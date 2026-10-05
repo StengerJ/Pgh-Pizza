@@ -40,6 +40,13 @@ describe('BlogFormPage', () => {
       .toContain('Add a slug using lowercase letters, numbers, and hyphens.');
   });
 
+  it('should report unsaved changes only while the form is dirty', () => {
+    const page = TestBed.createComponent(BlogFormPage).componentInstance;
+    expect(page.hasUnsavedChanges()).toBeFalse();
+    page.form.markAsDirty();
+    expect(page.hasUnsavedChanges()).toBeTrue();
+  });
+
   it('should reject a slug with uppercase letters', () => {
     const fixture = TestBed.createComponent(BlogFormPage);
     fixture.detectChanges();

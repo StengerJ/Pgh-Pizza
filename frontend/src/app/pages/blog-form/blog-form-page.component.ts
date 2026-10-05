@@ -1,8 +1,9 @@
-import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { focusFirstInvalid } from '../../core/forms/focus-first-invalid';
+import { HasUnsavedChanges } from '../../core/guards/unsaved-changes.guard';
 import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AuthService } from '../../core/services/auth.service';
 import { BlogService } from '../../core/services/blog.service';
@@ -15,7 +16,7 @@ import { extractYoutubeVideoId } from '../../core/utils/youtube';
   templateUrl: './blog-form-page.component.html',
   styleUrls: ['./blog-form-page.component.css']
 })
-export class BlogFormPage implements OnInit {
+export class BlogFormPage implements OnInit, HasUnsavedChanges {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly blogService = inject(BlogService);
@@ -24,6 +25,7 @@ export class BlogFormPage implements OnInit {
   private readonly host = inject(ElementRef<HTMLElement>).nativeElement;
   private static readonly slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
   private editingPostId: string | null = null;
+  private saved = false;
 
   readonly form = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(180)]],
@@ -73,6 +75,17 @@ export class BlogFormPage implements OnInit {
     });
   }
 
+  hasUnsavedChanges(): boolean {
+    return this.form.dirty && !this.saved;
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  warnOnUnload(event: BeforeUnloadEvent): void {
+    if (this.hasUnsavedChanges()) {
+      event.preventDefault();
+    }
+  }
+
   submit(): void {
     this.errorMessage.set('');
 
@@ -116,6 +129,7 @@ export class BlogFormPage implements OnInit {
 
     saveRequest.subscribe({
       next: (post) => {
+        this.saved = true;
         this.submitting.set(false);
         void this.router.navigate(['/blog', post.slug]);
       },
