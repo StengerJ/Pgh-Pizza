@@ -1,4 +1,11 @@
+<a class="skip-link" href="#main-content">Skip to Main Content</a>
 <app-navbar></app-navbar>
-<main class="app-main">
+@if (pendingReview()) {
+  <p class="pending-banner" role="status">
+    Your contributor application is waiting for admin review. You can browse ratings and posts;
+    publishing unlocks once you are approved.
+  </p>
+}
+<main class="app-main" id="main-content" tabindex="-1">
   <router-outlet></router-outlet>
 </main>

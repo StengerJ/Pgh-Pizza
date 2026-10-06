@@ -3,15 +3,17 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { BlogPost } from '../../core/models/blog-post.model';
 import { UserProfile } from '../../core/models/profile.model';
 import { AuthService } from '../../core/services/auth.service';
+import { ScorePipe } from '../../core/scores/score.pipe';
 import { ProfileService } from '../../core/services/profile.service';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [DatePipe, ReactiveFormsModule, RouterLink],
+  imports: [DatePipe, ReactiveFormsModule, RouterLink, ScorePipe],
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.css']
 })
@@ -99,8 +101,10 @@ export class ProfilePage implements OnInit {
         this.successMessage.set('Profile updated.');
         this.auth.refreshCurrentUser().subscribe({ error: () => undefined });
       },
-      error: () => {
-        this.errorMessage.set('Profile could not be saved.');
+      error: (error: unknown) => {
+        this.errorMessage.set(
+          apiErrorMessage(error, 'Profile could not be saved. Please try again.')
+        );
         this.saving.set(false);
       }
     });
@@ -116,7 +120,7 @@ export class ProfilePage implements OnInit {
   }
 
   excerpt(post: BlogPost): string {
-    return post.body.length > 140 ? `${post.body.slice(0, 140)}...` : post.body;
+    return post.body.length > 140 ? `${post.body.slice(0, 140)}…` : post.body;
   }
 
   selectProfilePicture(event: Event): void {

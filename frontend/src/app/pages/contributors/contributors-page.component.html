@@ -7,11 +7,11 @@
   </header>
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   <div class="contributors-grid" aria-label="Contributors">
-    @if (!loading() && contributors().length === 0) {
+    @if (!loading() && !loadFailed() && contributors().length === 0) {
       <p class="status empty">No contributors are available yet.</p>
     } @else {
       @for (contributor of contributors(); track contributor.id) {
@@ -19,6 +19,9 @@
           @if (contributor.profilePictureUrl) {
             <img
               class="profile-thumb"
+              width="72"
+              height="72"
+              loading="lazy"
               [src]="contributor.profilePictureUrl"
               [alt]="contributor.displayName + ' profile picture'"
             >

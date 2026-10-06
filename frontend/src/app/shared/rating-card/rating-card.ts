@@ -2,12 +2,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Rating } from '../../core/models/rating.model';
+import { ScorePipe } from '../../core/scores/score.pipe';
 import { ScoreBadge } from '../score-badge/score-badge';
 
 @Component({
   selector: 'app-rating-card',
   standalone: true,
-  imports: [RouterLink, ScoreBadge],
+  imports: [RouterLink, ScoreBadge, ScorePipe],
   templateUrl: './rating-card.html',
   styleUrls: ['./rating-card.css']
 })

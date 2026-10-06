@@ -1,14 +1,14 @@
 <section class="page table-page profile-page">
   @if (loading()) {
-    <p class="status">Loading profile...</p>
+    <p class="status" role="status">Loading profile…</p>
   }
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   @if (successMessage()) {
-    <p class="status success">{{ successMessage() }}</p>
+    <p class="status success" role="status">{{ successMessage() }}</p>
   }
 
   @if (profile(); as currentProfile) {
@@ -16,6 +16,8 @@
       @if (currentProfile.profilePictureUrl) {
         <img
           class="profile-photo"
+          width="112"
+          height="112"
           [src]="currentProfile.profilePictureUrl"
           [alt]="currentProfile.displayName + ' profile picture'"
         >
@@ -43,7 +45,7 @@
         <div class="split-grid">
           <div class="field">
             <label for="displayName">Profile name</label>
-            <input id="displayName" type="text" formControlName="displayName">
+            <input id="displayName" name="displayName" type="text" autocomplete="nickname" formControlName="displayName">
             @if (form.controls.displayName.touched && form.controls.displayName.invalid) {
               <small>Use 2 to 120 characters.</small>
             }
@@ -55,6 +57,8 @@
               @if (picturePreview(); as previewUrl) {
                 <img
                   class="picture-preview"
+                  width="88"
+                  height="88"
                   [src]="previewUrl"
                   alt="Selected profile picture preview"
                 >
@@ -87,7 +91,7 @@
 
         <div class="field">
           <label for="bio">Bio</label>
-          <textarea id="bio" maxlength="500" formControlName="bio"></textarea>
+          <textarea id="bio" name="bio" maxlength="500" formControlName="bio"></textarea>
           @if (form.controls.bio.touched && form.controls.bio.invalid) {
             <small>Bio must be 500 characters or fewer.</small>
           }
@@ -95,7 +99,7 @@
 
         <div class="actions">
           <button class="button primary" type="submit" [disabled]="saving()">
-            {{ saving() ? 'Saving...' : 'Save profile' }}
+            {{ saving() ? 'Saving…' : 'Save Profile' }}
           </button>
           <button class="button secondary" type="button" [disabled]="saving()" (click)="cancelEditing()">
             Cancel
@@ -117,7 +121,7 @@
               <th>Restaurant</th>
               <th>Location</th>
               <th>Overall</th>
-              <th>Affordability</th>
+              <th>Value</th>
               <th>Sauce</th>
               <th>Toppings</th>
               <th>Crust</th>
@@ -134,13 +138,13 @@
                 <tr>
                   <td data-label="Restaurant">{{ rating.restaurantName }}</td>
                   <td data-label="Location">{{ rating.location }}</td>
-                  <td class="rating-score" data-label="Overall">{{ rating.overallRating }}</td>
-                  <td class="rating-score" data-label="Affordability">
-                    {{ rating.affordabilityRating }}
+                  <td class="rating-score" data-label="Overall">{{ rating.overallRating | score }}</td>
+                  <td class="rating-score" data-label="Value">
+                    {{ rating.affordabilityRating | score }}
                   </td>
-                  <td class="rating-score" data-label="Sauce">{{ rating.sauce }}</td>
-                  <td class="rating-score" data-label="Toppings">{{ rating.toppings }}</td>
-                  <td class="rating-score" data-label="Crust">{{ rating.crust }}</td>
+                  <td class="rating-score" data-label="Sauce">{{ rating.sauce | score }}</td>
+                  <td class="rating-score" data-label="Toppings">{{ rating.toppings | score }}</td>
+                  <td class="rating-score" data-label="Crust">{{ rating.crust | score }}</td>
                   <td data-label="Comments">{{ rating.comments }}</td>
                 </tr>
               }

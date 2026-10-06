@@ -7,15 +7,16 @@
   </header>
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   @if (successMessage()) {
-    <p class="status success">{{ successMessage() }}</p>
+    <p class="status success" role="status">{{ successMessage() }}</p>
   }
 
   <div class="section-heading">
     <h2>Contributor applications</h2>
+    <span class="subtle">{{ pendingApplications().length }} pending</span>
   </div>
 
   <div class="table-wrap">
@@ -25,15 +26,18 @@
           <th>Applicant</th>
           <th>Email</th>
           <th>Reason</th>
-          <th>Status</th>
           <th>Submitted</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        @if (!loadingApplications() && pendingApplications().length === 0) {
+        @if (applicationsFailed()) {
           <tr>
-            <td colspan="6" class="empty">No applications are waiting for review.</td>
+            <td colspan="5" class="empty">Applications could not be loaded. Refresh the page to try again.</td>
+          </tr>
+        } @else if (!loadingApplications() && !applicationsFailed() && pendingApplications().length === 0) {
+          <tr>
+            <td colspan="5" class="empty">No applications are waiting for review.</td>
           </tr>
         } @else {
           @for (application of pendingApplications(); track application.id) {
@@ -41,7 +45,6 @@
               <td data-label="Applicant">{{ application.displayName }}</td>
               <td data-label="Email">{{ application.email }}</td>
               <td data-label="Reason">{{ application.applicationReason }}</td>
-              <td data-label="Status">{{ application.status }}</td>
               <td data-label="Submitted">{{ application.createdAt | date: 'mediumDate' }}</td>
               <td data-label="Actions">
                 <div class="row-actions">
@@ -86,7 +89,11 @@
         </tr>
       </thead>
       <tbody>
-        @if (!loadingUsers() && users().length === 0) {
+        @if (usersFailed()) {
+          <tr>
+            <td colspan="5" class="empty">Users could not be loaded. Refresh the page to try again.</td>
+          </tr>
+        } @else if (!loadingUsers() && !usersFailed() && users().length === 0) {
           <tr>
             <td colspan="5" class="empty">No active users are available.</td>
           </tr>
@@ -160,7 +167,11 @@
         </tr>
       </thead>
       <tbody>
-        @if (!loadingContributors() && contributors().length === 0) {
+        @if (contributorsFailed()) {
+          <tr>
+            <td colspan="5" class="empty">Contributors could not be loaded. Refresh the page to try again.</td>
+          </tr>
+        } @else if (!loadingContributors() && !contributorsFailed() && contributors().length === 0) {
           <tr>
             <td colspan="5" class="empty">No active contributors are available.</td>
           </tr>
@@ -183,8 +194,8 @@
                           <strong>{{ rating.restaurantName }}</strong>
                           <span class="subtle">
                             {{ rating.location }} -
-                            Overall {{ rating.overallRating }}/10 -
-                            Affordability {{ rating.affordabilityRating }}/10 -
+                            Overall {{ rating.overallRating | score }}/10 -
+                            Value {{ rating.affordabilityRating | score }}/10 -
                             {{ rating.createdAt | date: 'mediumDate' }}
                           </span>
                         </div>

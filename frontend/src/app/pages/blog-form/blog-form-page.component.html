@@ -1,59 +1,106 @@
 <section class="page narrow-page">
   <header class="page-header">
     <div>
-      <h1>{{ editing() ? 'Edit blog post' : 'New blog post' }}</h1>
+      <h1>{{ editing() ? 'Edit Blog Post' : 'New Blog Post' }}</h1>
       <p>Maintain a contributor post with an optional YouTube video.</p>
     </div>
-    <a class="button secondary" routerLink="/blog">Back to blog</a>
+    <a class="button secondary" routerLink="/blog">Back to Blog</a>
   </header>
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   @if (loading()) {
-    <p class="status">Loading post...</p>
+    <p class="status" role="status">Loading post…</p>
   }
 
   <form class="form-panel" [formGroup]="form" (ngSubmit)="submit()">
     <div class="split-grid">
       <div class="field">
         <label for="title">Title</label>
-        <input id="title" type="text" formControlName="title">
+        <input
+          id="title"
+          name="title"
+          type="text"
+          autocomplete="off"
+          [attr.aria-describedby]="form.controls.title.touched && form.controls.title.invalid ? 'titleError' : null"
+          [attr.aria-invalid]="form.controls.title.touched && form.controls.title.invalid"
+          formControlName="title"
+        >
         @if (form.controls.title.touched && form.controls.title.invalid) {
-          <small>Title must be at least 4 characters.</small>
+          <small id="titleError">Use 4 to 180 characters.</small>
         }
       </div>
 
       <div class="field">
         <label for="location">Location</label>
-        <input id="location" type="text" formControlName="location">
+        <input
+          id="location"
+          name="location"
+          type="text"
+          autocomplete="off"
+          [attr.aria-describedby]="form.controls.location.touched && form.controls.location.invalid ? 'locationError' : null"
+          [attr.aria-invalid]="form.controls.location.touched && form.controls.location.invalid"
+          formControlName="location"
+        >
         @if (form.controls.location.touched && form.controls.location.invalid) {
-          <small>Location is required.</small>
+          <small id="locationError">Use 2 to 180 characters.</small>
         }
       </div>
     </div>
 
     <div class="field">
       <label for="slug">Slug</label>
-      <input id="slug" type="text" placeholder="leave blank to auto-generate" formControlName="slug">
+      <input
+        id="slug"
+        name="slug"
+        type="text"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="fiori-pizza-brookline…"
+        aria-describedby="slugHint"
+        [attr.aria-invalid]="form.controls.slug.touched && form.controls.slug.invalid"
+        formControlName="slug"
+      >
+      @if (form.controls.slug.touched && form.controls.slug.invalid) {
+        <small id="slugHint">Add a slug using lowercase letters, numbers, and hyphens.</small>
+      } @else {
+        <small id="slugHint" class="hint">Leave blank to generate one from the title.</small>
+      }
     </div>
 
     <div class="field">
-      <label for="youtubeUrl">YouTube URL or video ID</label>
-      <input id="youtubeUrl" type="text" inputmode="url" formControlName="youtubeUrl">
+      <label for="youtubeUrl">YouTube URL or Video ID</label>
+      <input
+        id="youtubeUrl"
+        name="youtubeUrl"
+        type="text"
+        inputmode="url"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="https://youtu.be/dQw4w9WgXcQ…"
+        formControlName="youtubeUrl"
+      >
     </div>
 
     <div class="field">
-      <label for="body">Post body</label>
-      <textarea id="body" formControlName="body"></textarea>
+      <label for="body">Post Body</label>
+      <textarea
+        id="body"
+        name="body"
+        autocomplete="off"
+        [attr.aria-describedby]="form.controls.body.touched && form.controls.body.invalid ? 'bodyError' : null"
+        [attr.aria-invalid]="form.controls.body.touched && form.controls.body.invalid"
+        formControlName="body"
+      ></textarea>
       @if (form.controls.body.touched && form.controls.body.invalid) {
-        <small>Post body must be at least 20 characters.</small>
+        <small id="bodyError">Write at least 20 characters (20,000 max).</small>
       }
     </div>
 
     <button class="button primary" type="submit" [disabled]="submitting()">
-      {{ submitting() ? 'Saving...' : editing() ? 'Save post' : 'Publish post' }}
+      {{ submitting() ? 'Saving…' : editing() ? 'Save Post' : 'Publish Post' }}
     </button>
   </form>
 </section>

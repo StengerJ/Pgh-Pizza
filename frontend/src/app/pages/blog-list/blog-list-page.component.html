@@ -11,15 +11,15 @@
   </header>
 
   @if (loading()) {
-    <p class="status">Loading posts...</p>
+    <p class="status" role="status">Loading posts…</p>
   }
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
-  @if (!loading() && posts().length === 0) {
-    <p class="status">No blog posts are available yet.</p>
+  @if (!loading() && !loadFailed() && posts().length === 0) {
+    <p class="status" role="status">No blog posts are available yet.</p>
   }
 
   <div class="post-grid">

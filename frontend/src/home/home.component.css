@@ -93,6 +93,14 @@ h1 {
   margin: 0;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .hero-media,
+  .hero-media:hover,
+  .feature-strip article:hover {
+    transform: none;
+  }
+}
+
 @media (max-width: 760px) {
   .hero {
     gap: 28px;

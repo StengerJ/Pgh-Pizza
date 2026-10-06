@@ -14,9 +14,9 @@ describe('RatingCard', () => {
     creator: 'Joshua Stenger',
     restaurantName: 'Fiori Pizza',
     location: 'Brookline',
-    sauce: 'Sweet',
-    toppings: 'Pepperoni',
-    crust: 'Crisp',
+    sauce: '7',
+    toppings: '8.25',
+    crust: '9.1',
     overallRating: 9.1,
     affordabilityRating: 8.5,
     comments: 'Classic Pittsburgh slice'
@@ -38,10 +38,11 @@ describe('RatingCard', () => {
 
     expect(nativeElement.textContent).toContain('Fiori Pizza');
     expect(nativeElement.textContent).toContain('Brookline');
-    expect(nativeElement.textContent).toContain('Sweet');
-    expect(nativeElement.textContent).toContain('Pepperoni');
-    expect(nativeElement.textContent).toContain('Crisp');
     expect(nativeElement.textContent).toContain('9.1');
+    expect(nativeElement.textContent).toContain('Value 8.5/10');
+    expect(nativeElement.textContent).toContain('Sauce 7.0');
+    expect(nativeElement.textContent).toContain('Crust 9.1');
+    expect(nativeElement.textContent).toContain('Toppings 8.3');
     expect(nativeElement.textContent).toContain('Classic Pittsburgh slice');
   });
 

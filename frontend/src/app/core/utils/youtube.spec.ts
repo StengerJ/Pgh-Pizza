@@ -37,7 +37,7 @@ describe('youtube utilities', () => {
 
   it('should build safe YouTube embed URLs from validated IDs', () => {
     expect(buildYoutubeEmbedUrl('dQw4w9WgXcQ')).toBe(
-      'https://www.youtube.com/embed/dQw4w9WgXcQ'
+      'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ'
     );
   });
 });

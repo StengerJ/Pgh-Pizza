@@ -2,11 +2,11 @@
   <a class="button secondary back-link" routerLink="/blog">Back to blog</a>
 
   @if (loading()) {
-    <p class="status">Loading post...</p>
+    <p class="status" role="status">Loading post…</p>
   }
 
   @if (errorMessage()) {
-    <p class="status">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
   @if (post(); as currentPost) {
@@ -41,8 +41,9 @@
         <div class="video-frame">
           <iframe
             [src]="embedUrl()"
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            [title]="'Video: ' + currentPost.title"
+            loading="lazy"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen
           ></iframe>
         </div>

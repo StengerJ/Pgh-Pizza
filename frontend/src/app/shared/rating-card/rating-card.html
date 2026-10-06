@@ -8,10 +8,10 @@
   </header>
 
   <ul class="rating-card-tags" aria-label="Pizza details">
-    <li class="tag-chip value-chip">Value {{ rating.affordabilityRating }}/10</li>
-    <li class="tag-chip">Sauce: {{ rating.sauce }}</li>
-    <li class="tag-chip">Crust: {{ rating.crust }}</li>
-    <li class="tag-chip">Toppings: {{ rating.toppings }}</li>
+    <li class="tag-chip value-chip">Value {{ rating.affordabilityRating | score }}/10</li>
+    <li class="tag-chip">Sauce {{ rating.sauce | score }}</li>
+    <li class="tag-chip">Crust {{ rating.crust | score }}</li>
+    <li class="tag-chip">Toppings {{ rating.toppings | score }}</li>
   </ul>
 
   <p class="rating-card-comments">{{ rating.comments }}</p>

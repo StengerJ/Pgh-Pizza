@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { ContributorProfileSummary } from '../../core/models/profile.model';
 import { ProfileService } from '../../core/services/profile.service';
 
@@ -17,6 +18,7 @@ export class ContributorsPage implements OnInit {
 
   readonly contributors = signal<ContributorProfileSummary[]>([]);
   readonly loading = signal(true);
+  readonly loadFailed = signal(false);
   readonly errorMessage = signal('');
 
   ngOnInit(): void {
@@ -25,9 +27,12 @@ export class ContributorsPage implements OnInit {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (contributors) => this.contributors.set(contributors),
-        error: () => {
+        error: (error: unknown) => {
           this.contributors.set([]);
-          this.errorMessage.set('Contributors could not be loaded.');
+          this.loadFailed.set(true);
+          this.errorMessage.set(
+            apiErrorMessage(error, 'Contributors could not be loaded. Refresh the page to try again.')
+          );
         }
       });
   }

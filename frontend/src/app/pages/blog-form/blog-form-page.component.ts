@@ -1,7 +1,10 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
+import { focusFirstInvalid } from '../../core/forms/focus-first-invalid';
+import { HasUnsavedChanges } from '../../core/guards/unsaved-changes.guard';
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AuthService } from '../../core/services/auth.service';
 import { BlogService } from '../../core/services/blog.service';
 import { extractYoutubeVideoId } from '../../core/utils/youtube';
@@ -13,20 +16,23 @@ import { extractYoutubeVideoId } from '../../core/utils/youtube';
   templateUrl: './blog-form-page.component.html',
   styleUrls: ['./blog-form-page.component.css']
 })
-export class BlogFormPage implements OnInit {
+export class BlogFormPage implements OnInit, HasUnsavedChanges {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly blogService = inject(BlogService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly host: HTMLElement = inject(ElementRef).nativeElement;
+  private static readonly slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
   private editingPostId: string | null = null;
+  private saved = false;
 
   readonly form = this.fb.group({
-    title: ['', [Validators.required, Validators.minLength(4)]],
+    title: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(180)]],
     location: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(180)]],
-    slug: [''],
-    body: ['', [Validators.required, Validators.minLength(20)]],
-    youtubeUrl: ['']
+    slug: ['', [Validators.maxLength(180), Validators.pattern(BlogFormPage.slugPattern)]],
+    body: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(20000)]],
+    youtubeUrl: ['', [Validators.maxLength(500)]]
   });
 
   readonly submitting = signal(false);
@@ -69,11 +75,23 @@ export class BlogFormPage implements OnInit {
     });
   }
 
+  hasUnsavedChanges(): boolean {
+    return this.form.dirty && !this.saved;
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  warnOnUnload(event: BeforeUnloadEvent): void {
+    if (this.hasUnsavedChanges()) {
+      event.preventDefault();
+    }
+  }
+
   submit(): void {
     this.errorMessage.set('');
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      focusFirstInvalid(this.host);
       return;
     }
 
@@ -87,6 +105,14 @@ export class BlogFormPage implements OnInit {
     }
 
     const slug = value.slug.trim() || this.slugify(value.title);
+
+    if (!slug) {
+      this.form.controls.slug.setErrors({ pattern: true });
+      this.form.controls.slug.markAsTouched();
+      // The slug was valid a moment ago, so its ng-invalid class is not rendered yet.
+      this.host.querySelector<HTMLInputElement>('#slug')?.focus();
+      return;
+    }
 
     this.submitting.set(true);
     const request = {
@@ -104,11 +130,14 @@ export class BlogFormPage implements OnInit {
 
     saveRequest.subscribe({
       next: (post) => {
+        this.saved = true;
         this.submitting.set(false);
         void this.router.navigate(['/blog', post.slug]);
       },
-      error: () => {
-        this.errorMessage.set('Blog post could not be saved. Please try again later.');
+      error: (error: unknown) => {
+        this.errorMessage.set(
+          apiErrorMessage(error, 'Blog post could not be saved. Please try again later.')
+        );
         this.submitting.set(false);
       }
     });

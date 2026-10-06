@@ -11,13 +11,21 @@
   </header>
 
   @if (errorMessage()) {
-    <p class="status error">{{ errorMessage() }}</p>
+    <p class="status error" role="alert">{{ errorMessage() }}</p>
   }
 
-  @if (!loading() && ratings().length > 0) {
+  @if (ratings().length > 0 || hasActiveFilters()) {
     <section class="filter-panel" aria-label="Rating filters">
       <div class="filter-heading">
         <h2>Filters</h2>
+        <label class="sort-control" for="ratingSort">
+          Sort
+          <select id="ratingSort" name="ratingSort" (change)="setSort($event)">
+            <option value="newest" [selected]="sort() === 'newest'">Newest</option>
+            <option value="overall" [selected]="sort() === 'overall'">Highest Overall</option>
+            <option value="value" [selected]="sort() === 'value'">Best Value</option>
+          </select>
+        </label>
         <button class="button secondary" type="button" [disabled]="!hasActiveFilters()" (click)="clearFilters()">
           Clear
         </button>
@@ -28,6 +36,8 @@
           Restaurant
           <input
             id="ratingFilterRestaurant"
+            name="filterRestaurant"
+            autocomplete="off"
             type="search"
             list="ratingRestaurantOptions"
             [value]="filters().restaurantName"
@@ -39,6 +49,8 @@
           Location
           <input
             id="ratingFilterLocation"
+            name="filterLocation"
+            autocomplete="off"
             type="search"
             list="ratingLocationOptions"
             [value]="filters().location"
@@ -46,62 +58,12 @@
           >
         </label>
 
-        <label for="ratingFilterSauce">
-          Sauce
-          <input
-            id="ratingFilterSauce"
-            type="search"
-            [value]="filters().sauce"
-            (input)="setFilter('sauce', $event)"
-          >
-        </label>
-
-        <label for="ratingFilterToppings">
-          Toppings
-          <input
-            id="ratingFilterToppings"
-            type="search"
-            [value]="filters().toppings"
-            (input)="setFilter('toppings', $event)"
-          >
-        </label>
-
-        <label for="ratingFilterCrust">
-          Crust
-          <input
-            id="ratingFilterCrust"
-            type="search"
-            [value]="filters().crust"
-            (input)="setFilter('crust', $event)"
-          >
-        </label>
-
-        <label for="ratingFilterOverall">
-          Overall
-          <input
-            id="ratingFilterOverall"
-            type="search"
-            inputmode="decimal"
-            [value]="filters().overallRating"
-            (input)="setFilter('overallRating', $event)"
-          >
-        </label>
-
-        <label for="ratingFilterAffordability">
-          Affordability
-          <input
-            id="ratingFilterAffordability"
-            type="search"
-            inputmode="decimal"
-            [value]="filters().affordabilityRating"
-            (input)="setFilter('affordabilityRating', $event)"
-          >
-        </label>
-
         <label for="ratingFilterContributor">
           Contributor
           <input
             id="ratingFilterContributor"
+            name="filterContributor"
+            autocomplete="off"
             type="search"
             list="ratingContributorOptions"
             [value]="filters().creator"
@@ -113,11 +75,33 @@
           Comments
           <input
             id="ratingFilterComments"
+            name="filterComments"
+            autocomplete="off"
             type="search"
             [value]="filters().comments"
             (input)="setFilter('comments', $event)"
           >
         </label>
+      </div>
+
+      <div class="filter-grid score-filter-grid">
+        @for (score of scoreFilters; track score.key) {
+          <label [for]="score.id">
+            {{ score.label }}
+            <select
+              [id]="score.id"
+              [attr.name]="score.id"
+              (change)="setFilter(score.key, $event)"
+            >
+              <option value="" [selected]="filters()[score.key] === ''">Any</option>
+              @for (minimum of minimumScores; track minimum) {
+                <option [value]="minimum" [selected]="filters()[score.key] === '' + minimum">
+                  {{ minimum }}+
+                </option>
+              }
+            </select>
+          </label>
+        }
       </div>
 
       <datalist id="ratingRestaurantOptions">
@@ -140,14 +124,22 @@
     </section>
   }
 
-  <div class="ratings-grid" aria-label="Pizza ratings">
-    @if (!loading() && ratings().length === 0) {
+  @if (loading()) {
+    <p class="status" role="status">Loading ratings…</p>
+  }
+
+  <div class="ratings-grid" role="list" aria-label="Pizza ratings">
+    @if (!loading() && !loadFailed() && ratings().length === 0) {
       <p class="status empty">No ratings are available yet.</p>
-    } @else if (!loading() && filteredRatings().length === 0) {
-      <p class="status empty">No ratings match those filters.</p>
+    } @else if (!loading() && ratings().length > 0 && filteredRatings().length === 0) {
+      <p class="status empty">
+        No ratings match those filters.
+        <button class="link-inline" type="button" (click)="clearFilters()">Clear Filters</button>
+      </p>
     } @else {
-      @for (rating of filteredRatings(); track rating.id ?? rating.restaurantName) {
+      @for (rating of visibleRatings(); track rating.id ?? rating.restaurantName) {
         <app-rating-card
+          role="listitem"
           [rating]="rating"
           [canManage]="canManage(rating)"
           [processing]="isProcessing(rating.id)"

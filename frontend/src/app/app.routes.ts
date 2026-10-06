@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Home } from '../home/home.component';
 import { AboutMe } from './about-me/about-me.component';
 import { adminGuard, contributorGuard } from './core/guards/role.guard';
+import { unsavedChangesGuard } from './core/guards/unsaved-changes.guard';
 import { AdminApplicationsPage } from './pages/admin-applications/admin-applications-page.component';
 import { ApplyPage } from './pages/apply/apply-page.component';
 import { BlogDetailPage } from './pages/blog-detail/blog-detail-page.component';
@@ -28,12 +29,14 @@ export const routes: Routes = [
     path: 'ratings/new',
     component: RatingFormPage,
     canActivate: [contributorGuard],
+    canDeactivate: [unsavedChangesGuard],
     title: 'Add Rating | PGH Pizza'
   },
   {
     path: 'ratings/:id/edit',
     component: RatingFormPage,
     canActivate: [contributorGuard],
+    canDeactivate: [unsavedChangesGuard],
     title: 'Edit Rating | PGH Pizza'
   },
   {
@@ -56,12 +59,14 @@ export const routes: Routes = [
     path: 'blog/new',
     component: BlogFormPage,
     canActivate: [contributorGuard],
+    canDeactivate: [unsavedChangesGuard],
     title: 'New Blog Post | PGH Pizza'
   },
   {
     path: 'blog/:slug/edit',
     component: BlogFormPage,
     canActivate: [contributorGuard],
+    canDeactivate: [unsavedChangesGuard],
     title: 'Edit Blog Post | PGH Pizza'
   },
   {

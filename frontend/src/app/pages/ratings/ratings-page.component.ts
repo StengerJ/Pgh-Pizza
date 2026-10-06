@@ -1,8 +1,10 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { Rating } from '../../core/models/rating.model';
+import { toScore } from '../../core/scores/score';
 import { AuthService } from '../../core/services/auth.service';
 import { RatingsService } from '../../core/services/ratings.service';
 import { RatingCard } from '../../shared/rating-card/rating-card';
@@ -19,6 +21,18 @@ type RatingFilterKey =
   | 'comments';
 
 type RatingFilters = Record<RatingFilterKey, string>;
+
+type RatingSort = 'newest' | 'overall' | 'value';
+
+const sorts: readonly RatingSort[] = ['newest', 'overall', 'value'];
+
+const scoreFilterKeys: readonly RatingFilterKey[] = [
+  'overallRating',
+  'affordabilityRating',
+  'sauce',
+  'crust',
+  'toppings'
+];
 
 const emptyFilters: RatingFilters = {
   restaurantName: '',
@@ -42,15 +56,30 @@ const emptyFilters: RatingFilters = {
 export class RatingsPage implements OnInit {
   private readonly ratingsService = inject(RatingsService);
   private readonly auth = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly ratings = signal<Rating[]>([]);
   readonly loading = signal(true);
+  readonly loadFailed = signal(false);
   readonly errorMessage = signal('');
   readonly processingIds = signal<Set<string>>(new Set());
-  readonly filters = signal<RatingFilters>({ ...emptyFilters });
+  readonly filters = signal<RatingFilters>(this.filtersFromUrl());
+  readonly sort = signal<RatingSort>(this.sortFromUrl());
+  readonly minimumScores = [9, 8, 7, 6, 5];
 
-  readonly hasActiveFilters = computed(() =>
-    Object.values(this.filters()).some((value) => value.trim().length > 0)
+  readonly scoreFilters: { key: RatingFilterKey; id: string; label: string }[] = [
+    { key: 'overallRating', id: 'ratingFilterOverall', label: 'Min Overall' },
+    { key: 'affordabilityRating', id: 'ratingFilterAffordability', label: 'Min Value' },
+    { key: 'sauce', id: 'ratingFilterSauce', label: 'Min Sauce' },
+    { key: 'crust', id: 'ratingFilterCrust', label: 'Min Crust' },
+    { key: 'toppings', id: 'ratingFilterToppings', label: 'Min Toppings' }
+  ];
+
+  readonly hasActiveFilters = computed(
+    () =>
+      this.sort() !== 'newest' ||
+      Object.values(this.filters()).some((value) => value.trim().length > 0)
   );
 
   readonly restaurantFilterOptions = computed(() => this.uniqueFilterOptions('restaurantName'));
@@ -67,8 +96,21 @@ export class RatingsPage implements OnInit {
     }
 
     return this.ratings().filter((rating) =>
-      activeFilters.every(([key, value]) => this.filterValue(rating, key).includes(value))
+      activeFilters.every(([key, value]) => this.matches(rating, key, value))
     );
+  });
+
+  readonly visibleRatings = computed(() => {
+    const ratings = [...this.filteredRatings()];
+    const sort = this.sort();
+
+    if (sort === 'overall') {
+      ratings.sort((a, b) => b.overallRating - a.overallRating);
+    } else if (sort === 'value') {
+      ratings.sort((a, b) => b.affordabilityRating - a.affordabilityRating);
+    }
+
+    return ratings;
   });
 
   ngOnInit(): void {
@@ -77,7 +119,13 @@ export class RatingsPage implements OnInit {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (ratings) => this.ratings.set(ratings),
-        error: () => this.ratings.set([])
+        error: (error: unknown) => {
+          this.ratings.set([]);
+          this.loadFailed.set(true);
+          this.errorMessage.set(
+            apiErrorMessage(error, 'Ratings could not be loaded. Refresh the page to try again.')
+          );
+        }
       });
   }
 
@@ -91,12 +139,21 @@ export class RatingsPage implements OnInit {
   }
 
   setFilter(key: RatingFilterKey, event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
+    const value = (event.target as HTMLInputElement | HTMLSelectElement).value;
     this.filters.update((filters) => ({ ...filters, [key]: value }));
+    this.syncUrl();
+  }
+
+  setSort(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value as RatingSort;
+    this.sort.set(sorts.includes(value) ? value : 'newest');
+    this.syncUrl();
   }
 
   clearFilters(): void {
     this.filters.set({ ...emptyFilters });
+    this.sort.set('newest');
+    this.syncUrl();
   }
 
   isProcessing(id?: string): boolean {
@@ -120,8 +177,10 @@ export class RatingsPage implements OnInit {
         );
         this.setProcessing(ratingId, false);
       },
-      error: () => {
-        this.errorMessage.set('Rating could not be removed.');
+      error: (error: unknown) => {
+        this.errorMessage.set(
+          apiErrorMessage(error, 'Rating could not be removed. Please try again.')
+        );
         this.setProcessing(ratingId, false);
       }
     });
@@ -137,6 +196,42 @@ export class RatingsPage implements OnInit {
     }
 
     this.processingIds.set(nextIds);
+  }
+
+  private filtersFromUrl(): RatingFilters {
+    const params = this.route.snapshot.queryParamMap;
+    const filters = { ...emptyFilters };
+
+    for (const key of Object.keys(emptyFilters) as RatingFilterKey[]) {
+      filters[key] = params.get(key) ?? '';
+    }
+
+    return filters;
+  }
+
+  private syncUrl(): void {
+    const queryParams = {
+      ...Object.fromEntries(
+        Object.entries(this.filters()).map(([key, value]) => [key, value.trim() || null])
+      ),
+      sort: this.sort() === 'newest' ? null : this.sort()
+    };
+    void this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl: true });
+  }
+
+  private sortFromUrl(): RatingSort {
+    const value = this.route.snapshot.queryParamMap.get('sort') as RatingSort | null;
+    return value && sorts.includes(value) ? value : 'newest';
+  }
+
+  private matches(rating: Rating, key: RatingFilterKey, value: string): boolean {
+    if (scoreFilterKeys.includes(key)) {
+      const minimum = toScore(value);
+      const score = toScore(rating[key as keyof Rating]);
+      return minimum === null || (score !== null && score >= minimum);
+    }
+
+    return this.filterValue(rating, key).includes(value);
   }
 
   private filterValue(rating: Rating, key: RatingFilterKey): string {

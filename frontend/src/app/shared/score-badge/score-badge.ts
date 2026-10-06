@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
 
+import { formatScore } from '../../core/scores/score';
+
 type ScoreTier = 'high' | 'mid' | 'low';
 
 @Component({
@@ -25,6 +27,6 @@ export class ScoreBadge {
   }
 
   get display(): string {
-    return this.score.toFixed(1);
+    return formatScore(this.score);
   }
 }

@@ -73,7 +73,11 @@ export class AuthService {
 
   private persistSession(session: AuthSession): void {
     this.sessionSignal.set(session);
-    localStorage.setItem(this.storageKey, JSON.stringify(session));
+    const storedSession: AuthSession = {
+      ...session,
+      user: { ...session.user, profilePictureUrl: null }
+    };
+    localStorage.setItem(this.storageKey, JSON.stringify(storedSession));
   }
 
   private readSession(): AuthSession | null {
@@ -85,10 +89,24 @@ export class AuthService {
 
     try {
       const session = JSON.parse(rawSession) as AuthSession;
-      return session.token && session.user ? session : null;
+      if (!session.token || !session.user || this.isExpired(session.token)) {
+        localStorage.removeItem(this.storageKey);
+        return null;
+      }
+      return session;
     } catch {
       localStorage.removeItem(this.storageKey);
       return null;
+    }
+  }
+
+  private isExpired(token: string): boolean {
+    try {
+      const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      const exp = (JSON.parse(atob(payload)) as { exp?: unknown }).exp;
+      return typeof exp === 'number' && exp * 1000 <= Date.now();
+    } catch {
+      return false;
     }
   }
 }

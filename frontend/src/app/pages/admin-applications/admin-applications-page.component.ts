@@ -7,9 +7,11 @@ import {
   AdminContributorBlogPost,
   AdminContributorRating
 } from '../../core/models/admin-contributor.model';
+import { apiErrorMessage } from '../../core/http/api-error-message';
 import { AdminUser } from '../../core/models/admin-user.model';
 import { ApplicationStatus, ContributorApplication } from '../../core/models/application.model';
 import { UserRole } from '../../core/models/user.model';
+import { ScorePipe } from '../../core/scores/score.pipe';
 import { AdminService } from '../../core/services/admin.service';
 import { ApplicationsService } from '../../core/services/applications.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -19,7 +21,7 @@ import { RatingsService } from '../../core/services/ratings.service';
 @Component({
   selector: 'app-admin-applications-page',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, ScorePipe],
   templateUrl: './admin-applications-page.component.html',
   styleUrls: ['./admin-applications-page.component.css']
 })
@@ -37,6 +39,9 @@ export class AdminApplicationsPage implements OnInit {
   readonly loadingApplications = signal(true);
   readonly loadingContributors = signal(true);
   readonly loadingUsers = signal(true);
+  readonly applicationsFailed = signal(false);
+  readonly contributorsFailed = signal(false);
+  readonly usersFailed = signal(false);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
   readonly pendingApplications = computed(() =>
@@ -54,6 +59,10 @@ export class AdminApplicationsPage implements OnInit {
   }
 
   reject(application: ContributorApplication): void {
+    if (!confirm(`Reject the application from ${application.displayName}? This cannot be undone.`)) {
+      return;
+    }
+
     this.updateApplication(application.id, 'REJECTED');
   }
 
@@ -82,7 +91,7 @@ export class AdminApplicationsPage implements OnInit {
         );
         this.finishAction(key, 'Rating removed.');
       },
-      error: () => this.failAction(key, 'Rating could not be removed.')
+      error: (error: unknown) => this.failAction(key, error, 'Rating could not be removed.')
     });
   }
 
@@ -111,7 +120,7 @@ export class AdminApplicationsPage implements OnInit {
         );
         this.finishAction(key, 'Blog post removed.');
       },
-      error: () => this.failAction(key, 'Blog post could not be removed.')
+      error: (error: unknown) => this.failAction(key, error, 'Blog post could not be removed.')
     });
   }
 
@@ -131,7 +140,7 @@ export class AdminApplicationsPage implements OnInit {
         this.users.update((users) => users.filter((user) => user.id !== contributor.id));
         this.finishAction(key, 'Contributor removed.');
       },
-      error: () => this.failAction(key, 'Contributor could not be removed.')
+      error: (error: unknown) => this.failAction(key, error, 'Contributor could not be removed.')
     });
   }
 
@@ -156,7 +165,7 @@ export class AdminApplicationsPage implements OnInit {
         this.loadContributors();
         this.finishAction(key, 'User permission updated.');
       },
-      error: () => this.failAction(key, 'User permission could not be updated.')
+      error: (error: unknown) => this.failAction(key, error, 'User permission could not be updated.')
     });
   }
 
@@ -189,6 +198,7 @@ export class AdminApplicationsPage implements OnInit {
 
   private loadApplications(): void {
     this.loadingApplications.set(true);
+    this.applicationsFailed.set(false);
     this.applicationsService
       .listApplications()
       .pipe(finalize(() => this.loadingApplications.set(false)))
@@ -196,13 +206,14 @@ export class AdminApplicationsPage implements OnInit {
         next: (applications) => this.applications.set(applications),
         error: () => {
           this.applications.set([]);
-          this.errorMessage.set('Applications could not be loaded.');
+          this.applicationsFailed.set(true);
         }
       });
   }
 
   private loadContributors(): void {
     this.loadingContributors.set(true);
+    this.contributorsFailed.set(false);
     this.adminService
       .listContributors()
       .pipe(finalize(() => this.loadingContributors.set(false)))
@@ -210,13 +221,14 @@ export class AdminApplicationsPage implements OnInit {
         next: (contributors) => this.contributors.set(contributors),
         error: () => {
           this.contributors.set([]);
-          this.errorMessage.set('Contributors could not be loaded.');
+          this.contributorsFailed.set(true);
         }
       });
   }
 
   private loadUsers(): void {
     this.loadingUsers.set(true);
+    this.usersFailed.set(false);
     this.adminService
       .listUsers()
       .pipe(finalize(() => this.loadingUsers.set(false)))
@@ -224,7 +236,7 @@ export class AdminApplicationsPage implements OnInit {
         next: (users) => this.users.set(users),
         error: () => {
           this.users.set([]);
-          this.errorMessage.set('Users could not be loaded.');
+          this.usersFailed.set(true);
         }
       });
   }
@@ -251,7 +263,7 @@ export class AdminApplicationsPage implements OnInit {
         }
         this.finishAction(key, `Application ${status.toLowerCase()}.`);
       },
-      error: () => this.failAction(key, 'Application status could not be updated.')
+      error: (error: unknown) => this.failAction(key, error, 'Application status could not be updated.')
     });
   }
 
@@ -266,8 +278,8 @@ export class AdminApplicationsPage implements OnInit {
     this.setProcessing(key, false);
   }
 
-  private failAction(key: string, message: string): void {
-    this.errorMessage.set(message);
+  private failAction(key: string, error: unknown, fallback: string): void {
+    this.errorMessage.set(apiErrorMessage(error, fallback));
     this.setProcessing(key, false);
   }
 

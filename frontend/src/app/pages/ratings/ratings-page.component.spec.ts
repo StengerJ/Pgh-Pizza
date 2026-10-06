@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 
 import { RatingsPage } from './ratings-page.component';
 
@@ -48,9 +48,9 @@ describe('RatingsPage', () => {
         creator: 'Joshua Stenger',
         restaurantName: 'Fiori Pizza',
         location: 'Brookline',
-        sauce: 'Sweet',
-        toppings: 'Pepperoni',
-        crust: 'Crisp',
+        sauce: '7',
+        toppings: '8.2',
+        crust: '9.1',
         overallRating: 9.1,
         affordabilityRating: 8.5,
         comments: 'Classic Pittsburgh slice'
@@ -64,25 +64,11 @@ describe('RatingsPage', () => {
     expect(cards.length).toBe(1);
     expect(nativeElement.textContent).toContain('Fiori Pizza');
     expect(nativeElement.textContent).toContain('Brookline');
-    expect(nativeElement.textContent).toContain('Sweet');
-    expect(nativeElement.textContent).toContain('Pepperoni');
-    expect(nativeElement.textContent).toContain('Crisp');
+    expect(nativeElement.textContent).toContain('Sauce 7.0');
+    expect(nativeElement.textContent).toContain('Toppings 8.2');
+    expect(nativeElement.textContent).toContain('Crust 9.1');
     expect(nativeElement.textContent).toContain('9.1');
     expect(nativeElement.textContent).toContain('Classic Pittsburgh slice');
-  });
-
-  it('should show the empty state instead of an error box when ratings fail to load', () => {
-    fixture.detectChanges();
-    httpTesting.expectOne('/api/ratings').flush(null, {
-      status: 500,
-      statusText: 'Server Error'
-    });
-    fixture.detectChanges();
-
-    const nativeElement = fixture.nativeElement as HTMLElement;
-
-    expect(nativeElement.querySelector('.status.error')).toBeNull();
-    expect(nativeElement.textContent).toContain('No ratings are available yet.');
   });
 
   it('should filter ratings and provide autofill options for key columns', () => {
@@ -94,9 +80,9 @@ describe('RatingsPage', () => {
         creator: 'Joshua Stenger',
         restaurantName: 'Fiori Pizza',
         location: 'Brookline',
-        sauce: 'Sweet',
-        toppings: 'Pepperoni',
-        crust: 'Crisp',
+        sauce: '7',
+        toppings: '8.2',
+        crust: '9.1',
         overallRating: 9.1,
         affordabilityRating: 8.5,
         comments: 'Classic Pittsburgh slice'
@@ -107,9 +93,9 @@ describe('RatingsPage', () => {
         creator: 'Tema',
         restaurantName: 'Mineo Pizza',
         location: 'Squirrel Hill',
-        sauce: 'Tangy',
-        toppings: 'Mushroom',
-        crust: 'Chewy',
+        sauce: '6.5',
+        toppings: '5',
+        crust: '7.4',
         overallRating: 8.2,
         affordabilityRating: 7,
         comments: 'Great stop'
@@ -141,5 +127,154 @@ describe('RatingsPage', () => {
     expect(restaurantOptions).toContain('Fiori Pizza');
     expect(locationOptions).toContain('Brookline');
     expect(contributorOptions).toContain('Joshua Stenger');
+  });
+
+  it('should show a loading message until ratings arrive', () => {
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Loading ratings…');
+    httpTesting.expectOne('/api/ratings').flush([]);
+  });
+
+  it('should show an error instead of the empty state when loading fails', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/ratings').flush(null, { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Ratings could not be loaded. Refresh the page to try again.');
+    expect(text).not.toContain('No ratings are available yet.');
+    expect((fixture.nativeElement as HTMLElement).querySelector('.status.error[role="alert"]'))
+      .not.toBeNull();
+  });
+
+  const scored = (id: string, overallRating: number, affordabilityRating = 5) => ({
+    id,
+    restaurantName: `R${id}`,
+    location: 'L',
+    sauce: '5',
+    toppings: '5',
+    crust: '5',
+    overallRating,
+    affordabilityRating,
+    comments: 'c'
+  });
+
+  it('should treat the overall filter as a minimum score', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/ratings').flush([scored('a', 6.9), scored('b', 9.2), scored('c', 10)]);
+    fixture.detectChanges();
+
+    const select = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLSelectElement>('#ratingFilterOverall')!;
+    select.value = '9';
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Rb');
+    expect(text).toContain('Rc');
+    expect(text).not.toContain('Ra');
+  });
+
+  it('should sort by highest overall score when chosen', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/ratings').flush([scored('a', 6.9), scored('b', 9.2), scored('c', 10)]);
+    fixture.detectChanges();
+
+    const sort = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLSelectElement>('#ratingSort')!;
+    sort.value = 'overall';
+    sort.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const names = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('app-rating-card h3')
+    ).map((heading) => heading.textContent?.trim());
+    expect(names).toEqual(['Rc', 'Rb', 'Ra']);
+  });
+
+  it('should write active filters to the URL query string', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/ratings').flush([
+      { id: '1', restaurantName: 'Fiori', location: 'Brookline', sauce: '5', toppings: '5', crust: '5', overallRating: 9, affordabilityRating: 8, comments: 'good' }
+    ]);
+    fixture.detectChanges();
+
+    const input = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLInputElement>('#ratingFilterLocation')!;
+    input.value = 'Brook';
+    input.dispatchEvent(new Event('input'));
+
+    const [, extras] = navigate.calls.mostRecent().args;
+    expect(extras?.queryParams?.['location']).toBe('Brook');
+    expect(extras?.queryParams?.['sauce']).toBeNull();
+    expect(extras?.replaceUrl).toBeTrue();
+  });
+});
+
+describe('RatingsPage URL filters', () => {
+  it('should apply filters from the query string on first render', async () => {
+    localStorage.clear();
+    await TestBed.configureTestingModule({
+      imports: [RatingsPage],
+      providers: [
+        provideZonelessChangeDetection(),
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { queryParamMap: convertToParamMap({ location: 'Brookline' }) } }
+        }
+      ]
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(RatingsPage);
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController).expectOne('/api/ratings').flush([
+      { id: '1', restaurantName: 'Fiori', location: 'Brookline', sauce: '5', toppings: '5', crust: '5', overallRating: 9, affordabilityRating: 8, comments: 'good' },
+      { id: '2', restaurantName: 'Mineo', location: 'Squirrel Hill', sauce: '5', toppings: '5', crust: '5', overallRating: 9, affordabilityRating: 8, comments: 'good' }
+    ]);
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(fixture.componentInstance.filters().location).toBe('Brookline');
+    expect(text).toContain('Fiori');
+    expect(text).not.toContain('Mineo');
+  });
+
+  it('should restore score filter and sort selections from the query string', async () => {
+    localStorage.clear();
+    TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      imports: [RatingsPage],
+      providers: [
+        provideZonelessChangeDetection(),
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: { queryParamMap: convertToParamMap({ overallRating: '9', sort: 'overall' }) }
+          }
+        }
+      ]
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(RatingsPage);
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController).expectOne('/api/ratings').flush([
+      { id: '1', restaurantName: 'R1', location: 'L', sauce: '5', toppings: '5', crust: '5', overallRating: 9.5, affordabilityRating: 8, comments: 'c' },
+      { id: '2', restaurantName: 'R2', location: 'L', sauce: '5', toppings: '5', crust: '5', overallRating: 6, affordabilityRating: 8, comments: 'c' }
+    ]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector<HTMLSelectElement>('#ratingFilterOverall')!.value).toBe('9');
+    expect(el.querySelector<HTMLSelectElement>('#ratingSort')!.value).toBe('overall');
+    expect(el.textContent).not.toContain('R2');
   });
 });

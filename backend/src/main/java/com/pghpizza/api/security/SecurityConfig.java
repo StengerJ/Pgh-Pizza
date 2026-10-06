@@ -43,14 +43,14 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/ratings", "/api/ratings/*",
-                                "/api/blog-posts", "/api/blog-posts/*",
-                                "/api/profiles/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, PublicReadBearerTokenResolver.PUBLIC_READ_PATHS).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/applications", "/api/auth/login",
                                 "/api/auth/password-reset/request", "/api/auth/password-reset/confirm",
                                 "/api/client-logs").permitAll()
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .bearerTokenResolver(new PublicReadBearerTokenResolver())
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .build();
     }
 
